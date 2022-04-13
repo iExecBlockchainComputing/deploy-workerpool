@@ -1,0 +1,190 @@
+version: '3.4'
+
+volumes:
+  mongodb-data:
+  nginxcerts:
+  nginxvhost:
+  nginxhtml:
+  companioncerts:
+
+services:
+  core:
+    image: $DOCKER_REGISTRY/iexec-core:$CORE_TAG
+    container_name: core
+    environment:
+      - IEXEC_CORE_WALLET_PATH=/iexec-wallet/encrypted-wallet.json
+      - IEXEC_CORE_WALLET_PASSWORD=$PROD_CORE_WALLET_PASSWORD
+      - IEXEC_CORE_MANAGEMENT_ACTUATORS=
+      - IEXEC_CORE_REQUIRED_WORKER_VERSION=$WORKER_TAG
+      - MONGO_HOST=mongo
+      - TZ=Europe/Paris
+      # chain
+      - IEXEC_PRIVATE_CHAIN_ADDRESS=$CHAIN_URL
+      - IEXEC_PUBLIC_CHAIN_ADDRESS=$CHAIN_URL
+      - IEXEC_CHAIN_ID=$CHAIN_ID
+      - IEXEC_IS_SIDECHAIN=$CHAIN_IS_SIDECHAIN
+      - IEXEC_HUB_ADDRESS=$CHAIN_HUB_ADDRESS
+      - POOL_ADDRESS=$PROD_POOL_ADDRESS
+      - REVEAL_TIMEOUT_PERIOD=120000
+      # result
+      - IEXEC_RESULT_REPOSITORY_HOST=$RESULT_HOST
+      - IEXEC_RESULT_REPOSITORY_PORT=443
+      - IEXEC_RESULT_REPOSITORY_PROTOCOL=https
+      # sms 
+      - IEXEC_SMS_HOST=$PROD_SMS_HOST
+      - IEXEC_SMS_PORT=443
+      - IEXEC_SMS_PROTOCOL=https
+      # blockchain-adapter
+      - IEXEC_CORE_CHAIN_ADAPTER_HOST=$PROD_CHAIN_ADAPTER_HOST
+      - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=$PROD_CHAIN_ADAPTER_PROTOCOL
+      - IEXEC_CORE_CHAIN_ADAPTER_PORT=$PROD_CHAIN_ADAPTER_PORT
+      - IEXEC_CORE_CHAIN_ADAPTER_PASSWORD=$PROD_CHAIN_ADAPTER_PASSWORD
+      - IEXEC_ASK_REPLICATE_PERIOD=30000
+      - IEXEC_START_BLOCK_NUMBER=$CHAIN_LAST_BLOCK
+      - IEXEC_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
+      - IEXEC_GAS_PRICE_CAP=$GAS_PRICE_CAP
+    volumes:
+      - ./core_wallet.json:/iexec-wallet/encrypted-wallet.json
+    expose:
+      - "13000"
+    ports:
+      - "7001:13000"
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: library/mongo:4.4
+    container_name: mongo
+    entrypoint: "/bin/bash"
+    command: -c "mongod --bind_ip_all --port 13002"
+    volumes:
+      - mongodb-data:/data/db
+    expose:
+      - 13002
+    restart: unless-stopped
+
+  mongo_ui:
+    image: mongo-express:0.54.0
+    container_name: mongo_ui
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=$PROD_MONGO_PASSWORD
+      - ME_CONFIG_MONGODB_PORT=13002
+      - VCAP_APP_PORT=13003
+    expose:
+      - 13003
+    ports:
+      - 7002:13003
+    restart: unless-stopped
+
+  grafana:
+    image: iexechub/grafana:$GRAFANA_TAG
+    container_name: grafana
+    environment:
+      - MONGO_PROXY_URL=http://mongodb-proxy:3333
+      - MONGO_DB_NAME=iexec
+      - MONGO_URL=mongodb://mongo:13002
+      - GF_SECURITY_ADMIN_PASSWORD=$PROD_GRAFANA_ADMIN_PASSWORD
+      - GRAFANA_HOST=localhost:3000
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=ViewerOrg
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_ALLOW_SIGN_UP=false
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GRAFANA_HOME_NAME=$STACK - $CHAIN - DEBUG Worker Pool
+      - GRAFANA_HOME_LOGO_WIDTH=35
+      - GRAFANA_HOME_LOGO_HEIGHT=35
+      - GRAFANA_HOME_LOGO_PATH=https://iex.ec/wp-content/uploads/2018/12/token.svg
+      - ACTIVATE_POOL_JOIN=0
+      - POOL_JOIN_WORKER_POOLNAME=
+      - POOL_JOIN_DEPOSIT=
+      - POOL_JOIN_CHAIN=
+      - POOL_JOIN_MINETHEREUM=
+      - POOL_JOIN_HUBCONTRACT=
+      - POOL_JOIN_WORKER_DOCKER_IMAGE_VERSION=
+      - POOL_JOIN_IEXEC_CORE_HOST=
+      - POOL_JOIN_https_=
+      - POOL_JOIN_IEXEC_SDK_VERSION=
+    expose:
+      - 3000
+    ports:
+      - 7000:3000
+    depends_on:
+      - mongo
+      - mongodb-proxy
+    restart: unless-stopped
+
+  mongodb-proxy:
+    image: iexechub/grafana-proxy:1.0.0
+    restart: unless-stopped
+
+
+  blockchain-adapter:
+    image: $DOCKER_REGISTRY/iexec-blockchain-adapter-api:$BLOCKCHAIN_ADAPTER_TAG
+    container_name: blockchain-adapter
+    environment:
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_NODE_ADDRESS=$CHAIN_URL
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_CHAIN_ID=$CHAIN_ID
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_IS_SIDECHAIN=$CHAIN_IS_SIDECHAIN
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_HUB_ADDRESS=$CHAIN_HUB_ADDRESS
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_BLOCK_TIME=$CHAIN_BLOCK_TIME
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_WALLET_PATH=/wallet.json
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_WALLET_PASSWORD=$PROD_CORE_WALLET_PASSWORD
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_MONGO_HOST=blockchain-adapter-mongo
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_PASSWORD=$PROD_CHAIN_ADAPTER_PASSWORD
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
+      - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_CAP=$GAS_PRICE_CAP
+    volumes:
+      - ./core_wallet.json:/wallet.json
+    ports:
+      - 13010:13010
+    restart: on-failure
+
+  blockchain-adapter-mongo:
+    image: library/mongo:4.4
+    container_name: blockchain-adapter-mongo
+    restart: on-failure
+    entrypoint: "/bin/bash"
+    command: -c "mongod --bind_ip_all --port 13012"
+    expose:
+      - 13012
+
+  blockchain-adapter-mongo-ui:
+    image: library/mongo-express:0.54
+    container_name: blockchain-adapter-mongo-ui
+    restart: on-failure
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=$PROD_MONGO_PASSWORD
+      - ME_CONFIG_MONGODB_PORT=13012
+      - ME_CONFIG_MONGODB_SERVER=blockchain-adapter-mongo
+      - VCAP_APP_PORT=13013
+    ports:
+      - 13013:13013
+    depends_on:
+      - blockchain-adapter-mongo
+
+  order-publisher-std:
+    image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
+    environment:
+      - CORE_URL=http://core:13000
+      - CHAIN=$CHAIN
+      - TRUST_VALUE=1
+      - CATEGORY_INDEX=0
+      - WORKERPOOL_ADDRESS=$PROD_POOL_ADDRESS
+      - TAG_VALUE=0x0000000000000000000000000000000000000000000000000000000000000000
+      - ORDER_PRICE=$ORDER_PRICE
+      - ORDER_PRICE_MIN=
+      - ORDER_PRICE_MAX=
+      - ORDER_VOLUME=1
+      - PUBLISH_PERIOD=30
+      - WALLETFILE=wallet.json
+      - WALLETPASSWORD=$PROD_CORE_WALLET_PASSWORD
+      - IS_GPU_POOL=False
+      - CHECK_SLEEP_TIME=30
+      - MAX_ORDER_NUMBER=3
+      - REQUESTER_RESTRICT=$ORDER_PUBLISHER_REQUESTER_RESTRICT
+    volumes:
+      - ./core_wallet.json:/wallets/wallet.json
+    restart: unless-stopped
