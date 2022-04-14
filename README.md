@@ -1,14 +1,15 @@
 # Table of contents
 - [Table of contents](#table-of-contents)
-- [Context <a name="context"></a>](#context-)
-- [Restrictions and recommandations <a name="Restrictions"></a>](#restrictions-and-recommandations-)
-- [Deploy my workerpool <a name="deployWorkerpool"></a>](#deploy-my-workerpool-)
-  - [Core setup <a name="deployCore"></a>](#core-setup-)
-    - [Core Registration <a name="deployCoreInit"></a>](#core-registration-)
-    - [Docker Config <a name="deployCoreConfig"></a>](#docker-config-)
-  - [Worker <a name="deployWorker"></a>](#worker-)
+- [Context](#context)
+- [Restrictions and recommandations](#restrictions-and-recommandations)
+- [Deploy my workerpool](#deploy-my-workerpool)
+  - [Core setup](#core-setup)
+    - [Core Registration](#core-registration)
+    - [Docker Config](#docker-config)
+      - [Docker for core](#docker-for-core)
+      - [Docker for worker](#docker-for-worker)
    
-# Context <a name="context"></a>
+# Context
 Here a repository to help you:
 - To deploy a scheduler and its workers
 - To register them on the iExec sidechain
@@ -17,16 +18,16 @@ Here a repository to help you:
 
 The scheduler (also named "core") is to 
 
-# Restrictions and recommandations <a name="Restrictions"></a>
+# Restrictions and recommandations
 - Only standard task, no SGX definition in this example.
 - Pay attention to the "workerpool orders" you will publish
 - All web services are exposed in HTTP and not HTTPS, we encourage you to setup a HTTPS endpoint if you plan to expose these services to anyone.
 - You will be connected to the main iExec sidechain : bellecour (see : https://blockscout-bellecour.iex.ec/ or https://bellecour.iex.ec)
 
-# Deploy my workerpool <a name="deployWorkerpool"></a>
+# Deploy my workerpool
 You should instal the iExec sdk CLI : https://github.com/iExecBlockchainComputing/iexec-sdk
-## Core setup <a name="deployCore"></a>
-### Core Registration <a name="deployCoreInit"></a>
+## Core setup
+### Core Registration
 - Open an empty directory
   
 - Initialize your iExec workspace in this directory :
@@ -85,7 +86,7 @@ You should instal the iExec sdk CLI : https://github.com/iExecBlockchainComputin
 
 -  Have a coffe, you're not done yet :-)
 
-### Docker Config <a name="deployCoreConfig"></a>
+### Docker Config
 - Create 2 servers : 
   - Server 1 will host Core services
     - Docker should be installed
@@ -94,10 +95,9 @@ You should instal the iExec sdk CLI : https://github.com/iExecBlockchainComputin
     - Docker should be installed<br>
   Later, you can add as many workers as you want.
 
-  During this example, we will assume that server 1 DNS name is ```"server1.private.home"```
+  During this example, we will assume that server 1 is at ```"192.168.20.122"```
 
-  If everything is running on your computer and you do not have any DNS name, you can map ```"server1.private.home"``` to your network IP in the ```"/etc/hosts"``` file.
-
+#### Docker for core
 
 - Connect to your "Server 1"
 - Create the core directory :
@@ -110,10 +110,10 @@ You should instal the iExec sdk CLI : https://github.com/iExecBlockchainComputin
   
 | Variables|Value|
 |----------|-----|
-|PROD_CHAIN_ADAPTER_HOST | server1.private.home|
+|PROD_CHAIN_ADAPTER_HOST | 192.168.20.122|
 |PROD_CHAIN_ADAPTER_PROTOCOL | http |
 |PROD_CHAIN_ADAPTER_PORT| 13010|
-|PROD_CORE_HOST|server1.private.home|
+|PROD_CORE_HOST|192.168.20.122|
 |PROD_CORE_PROTOCOL|http|
 |PROD_CORE_PORT|7001|
 |PROD_CHAIN_ADAPTER_PASSWORD| changeme|
@@ -133,7 +133,44 @@ One combination can be :
 - set ```"ORDER_PRICE"```  to ```0```.
   You will publish workerpool orders to run tasks as free, but only for your wallet.<br>
   No one (but you) will be able to use you workerpool, and you will not have to bower with RLC staking.
-#####
 
+- When you're satify by your configuration :
+```"docker-compose up -d"```
 
-## Worker <a name="deployWorker"></a>
+- You can check 2 services:
+  - Blockchain Adapter as configuration manager :
+  ```"http://192.168.20.122:13010/config/chain"```
+  - Core status :
+  ```"http://192.168.20.122:7001/metrics"```
+
+  Both of then should give you nice json.
+
+  Congratulation, you now how a running scheduler.
+  Let's add a worker to be fully functionnal
+
+#### Docker for worker
+You can create as many worker as you want, on the same server or one different one.
+- Connect to your "Server 2"
+- Create the worker directory :
+  <pre>mkdir /opt/worker</pre>
+- Populate this directory with :
+  - 2 files from this git repo : ```".env"``` and ```"worker_std/docker-compose.yml"```
+  
+  -  create a new wallet like you did for the core.<br>
+  Each worker have its own wallet.
+  <pre>iexec wallet create --keystoredir $PWD
+  mv UTC--* worker_wallet.json
+  </pre>
+  - Stake some RLC to this wallet like before.
+- Reuse the core ```".env"``` file
+  - set your ```"WORKER_NAME"```, should be unique.
+  - set the ```"PROD_WALLET_PASSWORD"``` to the wallet's password of this worker.
+  - You can remove the ```"#####<Core config>"``` parts
+
+- Start your worker : 
+```"docker-compose up -d"```
+
+- Reload the core status page, you should see 1 alive worker.
+  <pre> curl http://192.168.20.122:7001/metrics
+  </pre>
+  

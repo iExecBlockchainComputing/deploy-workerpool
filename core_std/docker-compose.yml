@@ -51,6 +51,8 @@ services:
       - "7001:13000"
     depends_on:
       - mongo
+    #extra_hosts:
+    #- "server1.private.home:192.168.20.122"
     restart: unless-stopped
 
   mongo:
