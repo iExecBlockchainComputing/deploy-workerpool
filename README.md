@@ -8,6 +8,7 @@
     - [Docker Config](#docker-config)
       - [Docker for core](#docker-for-core)
       - [Docker for worker](#docker-for-worker)
+- [Status Checking](#status-checking)
    
 # Context
 Here a repository to help you:
@@ -170,7 +171,22 @@ You can create as many worker as you want, on the same server or one different o
 - Start your worker : 
 ```"docker-compose up -d"```
 
+# Status Checking
 - Reload the core status page, you should see 1 alive worker.
   <pre> curl http://192.168.20.122:7001/metrics
   </pre>
-  
+
+- You can also see the workerpool orders published on the marketplace.
+  <pre>iexec orderbook workerpool 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --requester 0x0123456789000000000000000000000000000000
+  ℹ Using chain bellecour [chainId: 134]
+  ℹ Workerpoolorders details (1 to 1 of 1):
+  -
+    orderHash:         0x8baea41297c249255ea9bb1584fb0093b1319ff253171d364151da5816576341
+    price:             0
+    remaining:         1
+    category:          0
+    requesterrestrict: 0x0123456789000000000000000000000000000000
+
+  ✔ No more results
+  ℹ Trade in the browser at https://market.iex.ec
+  </pre>
