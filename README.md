@@ -12,6 +12,8 @@
 
 - [Status Checking](#status-checking)
 
+- [Order Management](#order-management)
+
 # Context
 
 This repository contains the necessary files to set up a scheduler (also known as core) and its workers.
@@ -358,3 +360,30 @@ mv UTC--* worker_wallet.json
     
     </pre>
 
+  
+
+# Order Management
+
+- Have a look at the [CLI Documentation](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md#SDK-CLI-for-Workerpools)
+- Basicly, you can restric who can use you workerpool by publishing specific a workerpool order
+  <pre>iexec workerpool publish --help
+
+  iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir "$PWD" --chain goerli --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
+  </pre>
+
+- You can unpublish all your workerpoolorders using
+  <pre>
+  iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --wallet-file "core_wallet.json" --keystoredir "$PWD"
+  </pre>
+
+
+# Workerpool enforcement
+## Workers Whitelisting
+- You can whitelist all the worker's wallet allowed to connect to your scheduler
+  - Edit the ```"docker-compose.yml"``` file on the scheduler server
+  - Add a new environment variable named ```"IEXEC_WORKERS_WHITELIST"``` for the ```"core"``` service
+  <pre>...
+  IEXEC_WORKERS_WHITELIST="0x0111111111000000000000000000000000000000,0x0222222222000000000000000000000000000000,0x0333333333000000000000000000000000000000"
+  ...
+  </pre>
+  - Restart the ```"core"``` docker service
