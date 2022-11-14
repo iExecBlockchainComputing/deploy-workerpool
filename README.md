@@ -97,9 +97,7 @@ Software
     mv UTC--* core_wallet.json
 </pre>
 
-  
-
-- Optionally, instead of creating a new wallet, you can import an existing wallet with the command:
+- Optionally, instead of creating a new wallet, you can use an existing one or import your private key with the command:
 
 <pre>
     iexec wallet import your_private_key 
@@ -113,6 +111,8 @@ Software
     mv UTC--* worker_wallet.json
 </pre>
 
+
+/!\ Make to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsability to save and protect thoses files and associated passwords even on the servers. 
   
 
 - Localy initialize you workerpool registration:
