@@ -256,7 +256,7 @@ Let's add a worker to complete the workerpool.
 
 ## Worker service deployment
 
-You may create as many workers as you want by repeating and adapting all the worker-specific procedures (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
+You may create as many workers as you want by repeating and adapting all the worker-specific steps (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
 
 We will copy files and start the worker services onto the Worker server : 
 
