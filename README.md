@@ -127,21 +127,20 @@ $ iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
 
 - Make sure the "owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
 
-<pre>
+```console
 $ jq .workerpool iexec.json 
-    
 "workerpool": {
     "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
     "description": "my-workerpool"
 }
-</pre>
+```
 
   
 
 - Register your workerpool on the blockchain to get its workerpool address:
 
-<pre>
-    ./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
+```console
+$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
     
     ℹ Using chain bellecour [chainId: 134]
     
@@ -151,7 +150,7 @@ $ jq .workerpool iexec.json
     
     ✔ Deployed new workerpool at address 0xabc...
     
-</pre>
+```
 
 
 Save your workerpool (deployment) address for later use (you might also find it in the deployed.json)
@@ -172,18 +171,18 @@ skiping puting and staking some RLC on the core's and worker's wallets (next ste
 
 Example using the iexec CLI:
 
-<pre>
-    iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OTHER_WALLET_WITH_RLC_FILE} --keystoredir ${DIRECTORY_OF_YOUR_OTHER_WALLET_WITH_RLC}
-</pre>
+```console
+$ iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OTHER_WALLET_WITH_RLC_FILE} --keystoredir ${DIRECTORY_OF_YOUR_OTHER_WALLET_WITH_RLC}
+```
 
   
 
 - Then stake this amount of RLC to the iExec account of the wallets
 
-<pre>
-    iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
-    iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
-</pre>
+```console
+$ iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
+$ iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
+```
 
   
 
@@ -290,14 +289,14 @@ You can check the service logs to see orders being published: <pre>docker-compos
 
 - Have a look at the [CLI Documentation](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md#SDK-CLI-for-Workerpools)
 - Basically, you can restric who can use you workerpool by publishing specific a workerpool order
-<pre>
-    iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir "$PWD" --chain goerli --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
-</pre>
+```console
+$ iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir "$PWD" --chain goerli --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
+```
 
 - You can unpublish all your workerpoolorders using
-<pre>
-  iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --wallet-file "core_wallet.json" --keystoredir "$PWD"
-</pre>
+```console
+$ iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --wallet-file "core_wallet.json" --keystoredir "$PWD"
+```
 
 
 # Going further (unsupported yet)
@@ -331,9 +330,10 @@ Same as [Reverse-proxy with HTTP](#Reverse-proxy-with-HTTP) but the Nginx revers
 ## TEE 
 
 In order to provide the SGX Scone device (/dev/isgx), you should install the Scone SGX drivers on the Worker server: 
-<pre>
-    curl -fssl https://raw.githubusercontent.com/SconeDocs/SH/master/install_sgx_driver.sh | bash
-</pre>
+
+```console
+$ curl -fssl https://raw.githubusercontent.com/SconeDocs/SH/master/install_sgx_driver.sh | bash
+```
 
 There also are 2 mandatory variables which will make the worker able to download the pre and post compute images: for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
 
