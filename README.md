@@ -70,24 +70,24 @@ Software
 - Initialize your iExec workspace in this directory:
 
 ```console
-   iexec init --skip-wallet 
+iexec init --skip-wallet 
 ```
 
   
 
 - Edit the "chain.json" file and change the "default" field from "viviani" to "bellecour"
 ```console
-    ./$ cat chain.json
-    {
-        "default": "bellecour",
-        "chains": {
-        "goerli": {},
-        "viviani": {},
-        "mainnet": {},
-        "bellecour": {},
-        "enterprise": {},
-        "enterprise-testnet": {}
-    }
+$ cat chain.json
+{
+    "default": "bellecour",
+    "chains": {
+    "goerli": {},
+    "viviani": {},
+    "mainnet": {},
+    "bellecour": {},
+    "enterprise": {},
+    "enterprise-testnet": {}
+}
 ```
 
 - Create a wallet for you scheduler (keep the core's wallet password safe):
