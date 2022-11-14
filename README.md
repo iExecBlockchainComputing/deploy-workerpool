@@ -70,7 +70,7 @@ Software
 - Initialize your iExec workspace in this directory:
 
 ```console
-iexec init --skip-wallet 
+$ iexec init --skip-wallet 
 ```
 
   
