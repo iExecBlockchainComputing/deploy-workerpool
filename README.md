@@ -248,7 +248,7 @@ We will copy files and start the core services onto the Core server :
     ```"http://$PROD_CORE_HOST:7000/"```
 
   
-Congratulations, you know how to run a scheduler.
+Congratulations, you are now running your own scheduler.
 
 Let's add a worker to complete the workerpool. 
 
