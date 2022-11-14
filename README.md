@@ -317,12 +317,12 @@ Some features can be combined (HTTPS + TEE) but some obviously can not (HTTP AND
 
 It helps not dealing with unusual ports but instead, offers some DNS names customization. 
 
-Copy files and add the environment variable PROD_GRAFANA_HOST for the Core services. 
+Copy files and add the environment variable ```PROD_GRAFANA_HOST``` for the Core services. 
 
-From the core service, you should, as a security issue, also remove from core/docker-compose.yml the ports redirections since the reverse-proxy is here for it. 
-      - 7001:13000
-      - 7000:3000
-      - 13010:13010
+From the core service, you should, as a security issue, also remove from ```core/docker-compose.yml``` the ports redirections since the reverse-proxy is here for it. 
+    * 7001:13000
+    * 7000:3000
+    * 13010:13010
 
 ## Reverse-proxy with HTTPS
 
