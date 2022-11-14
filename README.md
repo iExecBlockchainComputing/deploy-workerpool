@@ -44,11 +44,11 @@ The folllowing considerations must be taken into account:
 
 Server (minimal)
 
-- t2.medium AWS EC2 (or equivalent) server with 2 CPU, 4 GB of RAM and 16 GB of memory.
+- server with 2 CPU, 4 GB of RAM
 
 Server (minimal recommended)
 
-- t2.xlarge AWS EC2 (or equivalent) server with 4 CPU, 16 GB of RAM and 16 GB of memory.
+- server with 4 CPU, 16 GB of RAM
 
  
 Software
