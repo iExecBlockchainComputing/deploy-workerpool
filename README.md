@@ -201,7 +201,6 @@ Example using the iexec CLI :
     PROD_WALLET_PASSWORD
     PROD_CORE_HOST
     PROD_CHAIN_ADAPTER_HOST
-    PROD_GRAFANA_HOST
     WORKER_AVAILABLE_CPU
     PROD_POOL_ADDRESS
 </pre>
@@ -210,7 +209,7 @@ See how those variables are used in */docker-compose.yml and find the detailed c
 
 Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
 
-You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
+You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). It might be good for your own convenience to adapt the GRAFANA_HOME_NAME to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
   
 
 # Deployment
