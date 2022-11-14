@@ -57,7 +57,7 @@ Software
 
 # Configuration
 
-### Core (Scheduler) Registration
+## Core (Scheduler) Registration
 
 - Open an empty directory
 
@@ -84,24 +84,24 @@ Software
 
 - Create a wallet for you scheduler (keep the core's wallet password safe) :
 
-    <pre>
-        iexec wallet create --keystoredir $PWD 
-        mv UTC--* core_wallet.json
-    </pre>
+<pre>
+    iexec wallet create --keystoredir $PWD 
+    mv UTC--* core_wallet.json
+</pre>
 
   
 
 - Optionally, instead of creating a new wallet, you can import an existing wallet with the command :
 
-    <pre>iexec wallet import your_private_key </pre>
+<pre>iexec wallet import your_private_key </pre>
 
     
 - Create a wallet for you worker (keep the worker's wallet password safe) :
 
-    <pre>
-        iexec wallet create --keystoredir $PWD 
-        mv UTC--* worker_wallet.json
-    </pre>
+<pre>
+    iexec wallet create --keystoredir $PWD 
+    mv UTC--* worker_wallet.json
+</pre>
 
   
 
@@ -115,20 +115,21 @@ Software
 
 - Make sure the "owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
 
-    <pre>./$ jq .workerpool iexec.json 
-       
+<pre>
+    ./$ jq .workerpool iexec.json 
+        
     "workerpool": {
         "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
         "description": "my-workerpool"
     }
-    
-    </pre>
+</pre>
 
   
 
 - Register your workerpool on the blockchain to get its workerpool address :<br>
 
-    <pre>./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
+<pre>
+    ./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
     
     ℹ Using chain bellecour [chainId: 134]
     
@@ -138,7 +139,7 @@ Software
     
     ✔ Deployed new workerpool at address 0xabc...
     
-    </pre>
+</pre>
 
 
 Save your workerpool (deployment) address for later use (you might also find it in the deployed.json)
@@ -167,12 +168,39 @@ Example using the iexec CLI :
 
 - Then stake this amount of RLC to the iExec account of the wallets
 
-    <pre>
-        iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
-        iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
-    </pre>
+<pre>
+    iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
+    iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
+</pre>
 
   
+
+## Customization
+
+- Copy / clone this repo locally
+
+- Before spreading files, your need to customize a minimal set of variables in the .env file : 
+
+<pre>
+    PROD_CHAIN_ADAPTER_PASSWORD
+    PROD_GRAFANA_ADMIN_PASSWORD
+    PROD_MONGO_PASSWORD
+    PROD_CORE_WALLET_PASSWORD
+    PROD_WALLET_PASSWORD
+    SCONTAIN_REGISTRY_USERNAME
+    SCONTAIN_REGISTRY_PASSWORD
+    PROD_CORE_HOST
+    PROD_CHAIN_ADAPTER_HOST
+    PROD_GRAFANA_HOST
+    WORKER_AVAILABLE_CPU
+    PROD_POOL_ADDRESS
+</pre>
+
+See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
+
+Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. For Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
+
+You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
   
 
 ## Deployment
@@ -182,33 +210,6 @@ Example using the iexec CLI :
 - The Core server will host the Core services (scheduler). It should have a static IP or a DNS name.
 
 - The Worker server will host the worker services. 
-
-### Customization
-
-- Copy / clone this repo locally
-
-- Before spreading files, your need to customize a minimal set of variables in the .env file : 
-
-<pre>
-PROD_CHAIN_ADAPTER_PASSWORD
-PROD_GRAFANA_ADMIN_PASSWORD
-PROD_MONGO_PASSWORD
-PROD_CORE_WALLET_PASSWORD
-PROD_WALLET_PASSWORD
-SCONTAIN_REGISTRY_USERNAME
-SCONTAIN_REGISTRY_PASSWORD
-PROD_CORE_HOST
-PROD_CHAIN_ADAPTER_HOST
-PROD_GRAFANA_HOST
-WORKER_AVAILABLE_CPU
-PROD_POOL_ADDRESS
-</pre>
-
-See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
-
-Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. For Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
-
-You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core%20(Scheduler)%20Registration). 
 
 
 ### Core (Scheduler) service deployment
