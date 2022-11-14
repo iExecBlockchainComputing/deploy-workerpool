@@ -229,23 +229,23 @@ We will copy files and start the core services onto the Core server :
 
 - Copy the previously created ```"core_wallet.json"``` into ```"/opt/core/wallet.json"```  
 
-- For security issues, you *could* delete the worker-specific part in the .env file
+- For security issues, you *can* delete the worker-specific part in the .env file
 
 - Start the core services with ```"docker-compose up -d"``` from the core directory
 
 - You can check 3 services:
 
-- Blockchain Adapter exposes the blockchain configuration :
+    - Blockchain Adapter exposes the blockchain configuration :
 
-```"http://$PROD_CHAIN_ADAPTER_HOST:13010/config/chain"```
+    ```"http://$PROD_CHAIN_ADAPTER_HOST:13010/config/chain"```
 
-- Core metrics :
+    - Core metrics :
 
-```"http://$PROD_CORE_HOST:7001/metrics"```
+    ```"http://$PROD_CORE_HOST:7001/metrics"```
 
-- Grafana (core) metrics dashboard :
+    - Grafana (core) metrics dashboard :
 
-```"http://$PROD_CORE_HOST:7000/"```
+    ```"http://$PROD_CORE_HOST:7000/"```
 
   
 Congratulations, you know how to run a scheduler.
