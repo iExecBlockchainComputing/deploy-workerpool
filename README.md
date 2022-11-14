@@ -7,10 +7,16 @@
 - [Requirements](#requirements)
 
 - [Configuration](#configuration)
+    - [Core (Scheduler) Registration](#core-scheduler-registration)
+    - [Customization](#Customization)
+
+- [Deployment](#Deployment)
+    - [Core (Scheduler) service deployment](#Core-Scheduler-service-deployment)
+    - [Worker service deployment](#Worker-service-deployment)
 
 - [Status Checking](#status-checking)
 
-- [Order Management](#order-management)
+- [Going further (unsupported yet)](#Going-further-unsupported-yet)
 
 # Context
 
@@ -63,7 +69,9 @@ Software
 
 - Initialize your iExec workspace in this directory :
 
-   <pre> iexec init --skip-wallet </pre> 
+<pre>
+   iexec init --skip-wallet 
+</pre> 
 
   
 
@@ -93,7 +101,9 @@ Software
 
 - Optionally, instead of creating a new wallet, you can import an existing wallet with the command :
 
-<pre>iexec wallet import your_private_key </pre>
+<pre>
+    iexec wallet import your_private_key 
+</pre>
 
     
 - Create a wallet for you worker (keep the worker's wallet password safe) :
@@ -107,7 +117,9 @@ Software
 
 - Localy initialize you workerpool registration :
 
-    <pre>iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"</pre>
+<pre>
+    iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
+</pre>
 
   
 
@@ -203,7 +215,7 @@ Basicly, replace the wallets passwords with the corresponding ones and for the o
 You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
   
 
-## Deployment
+# Deployment
 
 - Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**) 
 
@@ -212,7 +224,7 @@ You may also want to customize some other variables for further uses but this is
 - The Worker server will host the worker services. 
 
 
-### Core (Scheduler) service deployment
+## Core (Scheduler) service deployment
 
 We will copy files and start the core services onto the Core server : 
 
@@ -245,7 +257,7 @@ Let's add a worker to complete the workerpool.
 
   
 
-### Worker service deployment
+## Worker service deployment
 
 You may create as many workers as you want by repeating and adapting all the worker-specific procedures (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
 
