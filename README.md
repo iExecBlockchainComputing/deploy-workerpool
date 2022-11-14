@@ -90,11 +90,19 @@ $ cat chain.json
 }
 ```
 
-- Create a wallet for you scheduler (keep the core's wallet password safe):
+- Create a wallet for you scheduler (keep the core's wallet password safe) and rename it accordingly:
 
 ```console
-$ iexec wallet create --keystoredir $PWD 
-$ mv UTC--* core_wallet.json
+$ iexec wallet create --keystoredir ./
+? Please choose a password for wallet encryption [hidden]
+? Please confirm your password [hidden]
+✔ Your wallet address is 0xaf1ceea065f5b9c8961ead7bbaf4e9262167c456
+Wallet saved in "UTC--2022-11-14T19-26-19.749000000Z--af1ceea065f5b9c8961ead7bbaf4e9262167c456":
+...
+⚠ You must backup your wallet file in a safe place!
+
+# rename the wallet
+$ mv   UTC--2022-11-14T19-26-19.749000000Z--af1ceea065f5b9c8961ead7bbaf4e9262167c456    core_wallet.json
 ```
 
 - Optionally, instead of creating a new wallet, you can use an existing one or import your private key with the command:
@@ -107,8 +115,10 @@ $ iexec wallet import your_private_key
 - Create a wallet for you worker (keep the worker's wallet password safe):
 
 ```console
-$ iexec wallet create --keystoredir $PWD 
-$ mv UTC--* worker_wallet.json
+$ iexec wallet create --keystoredir ./
+...
+# rename the wallet
+$ mv   UTC--2022-11-14T19-27-56.277000000Z--d2e57b7121fc43169aab2e3dc37e4338ca58a303    worker_wallet.json
 ```
 
 
