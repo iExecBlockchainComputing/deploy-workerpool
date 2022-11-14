@@ -33,7 +33,7 @@ services:
   letsencrypt:
     image: nginxproxy/acme-companion:2.2
     environment:
-      - DEFAULT_EMAIL=admins@your.domain
+      - DEFAULT_EMAIL=$LETSENCRYPT_ADMIN_EMAIL
       - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
       - nginxconf:/etc/nginx/conf.d

@@ -24,7 +24,7 @@ This repository contains the necessary files to set up a scheduler (also known a
 
   
 
-The folllowing considerations must be taken into account :
+The folllowing considerations must be taken into account:
 
   
 
@@ -67,7 +67,7 @@ Software
 
 - Open an empty directory
 
-- Initialize your iExec workspace in this directory :
+- Initialize your iExec workspace in this directory:
 
 <pre>
    iexec init --skip-wallet 
@@ -90,7 +90,7 @@ Software
     }
 </pre> 
 
-- Create a wallet for you scheduler (keep the core's wallet password safe) :
+- Create a wallet for you scheduler (keep the core's wallet password safe):
 
 <pre>
     iexec wallet create --keystoredir $PWD 
@@ -99,14 +99,14 @@ Software
 
   
 
-- Optionally, instead of creating a new wallet, you can import an existing wallet with the command :
+- Optionally, instead of creating a new wallet, you can import an existing wallet with the command:
 
 <pre>
     iexec wallet import your_private_key 
 </pre>
 
     
-- Create a wallet for you worker (keep the worker's wallet password safe) :
+- Create a wallet for you worker (keep the worker's wallet password safe):
 
 <pre>
     iexec wallet create --keystoredir $PWD 
@@ -115,7 +115,7 @@ Software
 
   
 
-- Localy initialize you workerpool registration :
+- Localy initialize you workerpool registration:
 
 <pre>
     iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
@@ -138,7 +138,7 @@ Software
 
   
 
-- Register your workerpool on the blockchain to get its workerpool address :<br>
+- Register your workerpool on the blockchain to get its workerpool address:
 
 <pre>
     ./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
@@ -170,7 +170,7 @@ skiping puting and staking some RLC on the core's and worker's wallets (next ste
 
 - First, put some RLC to the core's and worker's wallets using you favorite tool (metamask/iexec cli/...). Obviously, you need some RLC on another wallet for this.  
 
-Example using the iexec CLI :
+Example using the iexec CLI:
 
 <pre>
     iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OTHER_WALLET_WITH_RLC_FILE} --keystoredir ${DIRECTORY_OF_YOUR_OTHER_WALLET_WITH_RLC}
@@ -191,7 +191,7 @@ Example using the iexec CLI :
 
 - Copy / clone this repo locally
 
-- Before spreading files, your need to customize a minimal set of variables in the .env file : 
+- Before spreading files, your need to customize a minimal set of variables in the .env file: 
 
 <pre>
     PROD_CHAIN_ADAPTER_PASSWORD
@@ -223,7 +223,7 @@ You may also want to customize some other variables for further uses but this is
 
 ## Core (Scheduler) service deployment
 
-We will copy files and start the core services onto the Core server : 
+We will copy files and start the core services onto the Core server: 
 
 - Copy the customized .env and core directory in the ```"/opt"``` directory (or somewhere you'd rather install the core services)
 
@@ -235,15 +235,15 @@ We will copy files and start the core services onto the Core server :
 
 - You can check 3 services:
 
-    - Blockchain Adapter exposes the blockchain configuration :
+    - Blockchain Adapter exposes the blockchain configuration:
 
     ```"http://$PROD_CHAIN_ADAPTER_HOST:13010/config/chain"```
 
-    - Core metrics :
+    - Core metrics:
 
     ```"http://$PROD_CORE_HOST:7001/metrics"```
 
-    - Grafana (core) metrics dashboard :
+    - Grafana (core) metrics dashboard:
 
     ```"http://$PROD_CORE_HOST:7000/"```
 
@@ -258,7 +258,7 @@ Let's add a worker to complete the workerpool.
 
 You may create as many workers as you want by repeating and adapting all the worker-specific steps (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
 
-We will copy files and start the worker services onto the Worker server : 
+We will copy files and start the worker services onto the Worker server: 
 
 - Copy the customized .env and worker directory in the ```"/opt"``` directory (or somewhere you'd rather install the worker services)
 
@@ -281,9 +281,9 @@ We will copy files and start the worker services onto the Worker server :
 
 ## The Core server should publish workerpool orders
 
-The order-publisher-std service should publish workerpool orders on the marketplace (within some minutes). You can check those orders by running an iExec CLI command inside this container : <pre>docker-compose exec -T "order-publisher-std" sh -c 'iexec orderbook workerpool "$WORKERPOOL" --chain "$CHAIN" --tag "$TAG"'</pre> 
+The order-publisher-std service should publish workerpool orders on the marketplace (within some minutes). You can check those orders by running an iExec CLI command inside this container: <pre>docker-compose exec -T "order-publisher-std" sh -c 'iexec orderbook workerpool "$WORKERPOOL" --chain "$CHAIN" --tag "$TAG"'</pre> 
 
-You can check the service logs to see orders being published : <pre>docker-compose logs "order-publisher-std"</pre>
+You can check the service logs to see orders being published: <pre>docker-compose logs "order-publisher-std"</pre>
   
 
 ## Order manual management
@@ -326,16 +326,16 @@ From the core service, you should, as a security issue, also remove from ```core
 
 ## Reverse-proxy with HTTPS
 
-Same as [Reverse-proxy with HTTP](#Reverse-proxy-with-HTTP) but the Nginx reverse-proxy will also use Letsencrypt to generate HTTPS certificates for the DNS names so those DNS names must be public and you should provide a valid administrators email address. 
+Same as [Reverse-proxy with HTTP](#Reverse-proxy-with-HTTP) but the Nginx reverse-proxy will also use Letsencrypt to generate HTTPS certificates for the DNS names so those DNS names must be public and you should provide a valid administrators email address with ```LETSENCRYPT_ADMIN_EMAIL```
 
 ## TEE 
 
-In order to provide the SGX Scone device (/dev/isgx), you should install the Scone SGX drivers on the Worker server : 
+In order to provide the SGX Scone device (/dev/isgx), you should install the Scone SGX drivers on the Worker server: 
 <pre>
     curl -fssl https://raw.githubusercontent.com/SconeDocs/SH/master/install_sgx_driver.sh | bash
 </pre>
 
-There also are 2 mandatory variables which will make the worker able to download the pre and post compute images : for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
+There also are 2 mandatory variables which will make the worker able to download the pre and post compute images: for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
 
 You may also need to read the [Scontain documentation](https://sconedocs.github.io/). 
 
