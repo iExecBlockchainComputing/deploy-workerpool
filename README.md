@@ -320,9 +320,9 @@ It helps not dealing with unusual ports but instead, offers some DNS names custo
 Copy files and add the environment variable ```PROD_GRAFANA_HOST``` for the Core services. 
 
 From the core service, you should, as a security issue, also remove from ```core/docker-compose.yml``` the ports redirections since the reverse-proxy is here for it: 
-    * 7001:13000
-    * 7000:3000
-    * 13010:13010
+* 7001:13000
+* 7000:3000
+* 13010:13010
 
 ## Reverse-proxy with HTTPS
 
