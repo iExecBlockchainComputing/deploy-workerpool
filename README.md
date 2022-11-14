@@ -8,8 +8,6 @@
 
 - [Configuration](#configuration)
 
-- [Deployment](#core-setup)
-
 - [Status Checking](#status-checking)
 
 - [Order Management](#order-management)
@@ -38,11 +36,13 @@ The folllowing considerations must be taken into account :
 
 # Requirements
 
-  
-
 Server (minimal)
 
-- One t2.medium AWS EC2 (or equivalent) server with 2 CPU, 4 GB of RAM and 16 GB of memory.
+- t2.medium AWS EC2 (or equivalent) server with 2 CPU, 4 GB of RAM and 16 GB of memory.
+
+Server (minimal recommended)
+
+- t2.xlarge AWS EC2 (or equivalent) server with 4 CPU, 16 GB of RAM and 16 GB of memory.
 
  
 Software
@@ -53,17 +53,11 @@ Software
 
 - Docker & Docker-compose
 
-  
-  
+
 
 # Configuration
 
-  
-
-### Scheduler Registration
-
-  
-  
+### Core (Scheduler) Registration
 
 - Open an empty directory
 
@@ -77,31 +71,37 @@ Software
 <pre>
     ./$ cat chain.json
     {
-    "default": "bellecour",
-    "chains": {
-    "goerli": {},
-    "viviani": {},
-    "mainnet": {},
-    "bellecour": {},
-    "enterprise": {},
-    "enterprise-testnet": {}
+        "default": "bellecour",
+        "chains": {
+        "goerli": {},
+        "viviani": {},
+        "mainnet": {},
+        "bellecour": {},
+        "enterprise": {},
+        "enterprise-testnet": {}
     }
 </pre> 
-- Create a wallet for you scheduler (keep your password safe) :
 
-    <pre>iexec wallet create --keystoredir $PWD </pre>
+- Create a wallet for you scheduler (keep the core's wallet password safe) :
+
+    <pre>
+        iexec wallet create --keystoredir $PWD 
+        mv UTC--* core_wallet.json
+    </pre>
 
   
 
-- Optionally you can import an existing wallet with the command :
+- Optionally, instead of creating a new wallet, you can import an existing wallet with the command :
 
     <pre>iexec wallet import your_private_key </pre>
 
-  
+    
+- Create a wallet for you worker (keep the worker's wallet password safe) :
 
-- Rename the generated file as 'core_wallet.json' :
-
-    <pre>mv UTC--* core_wallet.json</pre>
+    <pre>
+        iexec wallet create --keystoredir $PWD 
+        mv UTC--* worker_wallet.json
+    </pre>
 
   
 
@@ -111,46 +111,24 @@ Software
 
   
 
-- Once the workerpool has been registred correclty, a message will appear :
+- Edit the "iexec.json" file and change the "workerpool.description" field from the 'my-workerpool' default value. This field will appear publicly on the blockchain and the marketplace.
 
-  
+- Make sure the "owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
 
-    <pre>Deployed new workerpool at address 0xabc...</pre>
-
-  
-
-You may also consult the workerpool metadata using the [explorer.](https://explorer.iex.ec/bellecour/workerpool/workerpooladdress)
-
-  
-
-Keep in mind that the workerpool address corresponds to the registration address and not the wallet owner address
-
-  
-
-- Edit the "iexec.json" file and change the "workerpool.description" field from the 'my-workerpool' default value.<br>
-
-- This field will appear publicly on the blockchain and the marketplace.
-
-- The "owner" field must match the public address of the "core_wallet.json" wallet file.
-
-    <pre>./$ cat iexec.json
-    
-    ...
-    
+    <pre>./$ jq .workerpool iexec.json 
+       
     "workerpool": {
-    "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
-    "description": "changeme"
+        "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
+        "description": "my-workerpool"
     }
-    
-    ...
     
     </pre>
 
   
 
-- Register your workerpool on the blockchain to get its "workerpool address" :<br>
+- Register your workerpool on the blockchain to get its workerpool address :<br>
 
-    <pre>./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD" --chain bellecour
+    <pre>./$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
     
     ℹ Using chain bellecour [chainId: 134]
     
@@ -158,27 +136,40 @@ Keep in mind that the workerpool address corresponds to the registration address
     
     Please enter your password to unlock your wallet [hidden]
     
-    ✔ Deployed new workerpool at address 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
+    ✔ Deployed new workerpool at address 0xabc...
     
     </pre>
 
+
+Save your workerpool (deployment) address for later use (you might also find it in the deployed.json)
+  
+
+You may now consult the workerpool metadata by typing your workerpool address into the search area on the [explorer](https://explorer.iex.ec/bellecour/).
+
+  
+
+Keep in mind that the workerpool address corresponds to your workerpool registration address and not the wallet owner address. 
+
  
-If using a "private" workerpool (all orders cost 0 RLC), the following section can be skipped :
+If using a free workerpool (workerpool orders with price = 0 RLC), you can jump to the next section ([Deployment](#Deployment)) by
+skiping puting and staking some RLC on the core's and worker's wallets (next step). 
+  
+
+- First, put some RLC to the core's and worker's wallets using you favorite tool (metamask/iexec cli/...). Obviously, you need some RLC on another wallet for this.  
+
+Example using the iexec CLI :
+
+<pre>
+    iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OTHER_WALLET_WITH_RLC_FILE} --keystoredir ${DIRECTORY_OF_YOUR_OTHER_WALLET_WITH_RLC}
+</pre>
 
   
 
-- Send some RLC to the wallet "core_wallet.json" using you favorite tool (metamask/iexec cli/...)<br>
+- Then stake this amount of RLC to the iExec account of the wallets
 
-CHANGE THE "--to" ADDRESS BY YOUR OWN.
-
-    <pre>iexec wallet send-RLC "10" --to "0x6DdF0Bf919f108376136a64219B395117229BaF6" --wallet-file ${YOUR_WALLET_FILE} --keystoredir ${YOU_WALLET_DIR}</pre>
-
-  
-
-- Send this amount to the iExec account of the wallet
-
-    <pre>iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir $PWD
-    
+    <pre>
+        iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
+        iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
     </pre>
 
   
@@ -186,183 +177,106 @@ CHANGE THE "--to" ADDRESS BY YOUR OWN.
 
 ## Deployment
 
-- Create 2 servers (or deploy  1 worker and 1 scheduler in one machine) :
+- Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**) 
 
-- Server 1 will host Core services (scheduler)
+- The Core server will host the Core services (scheduler). It should have a static IP or a DNS name.
 
-- It should have a static IP or a DNS name.
+- The Worker server will host the worker services. 
 
-- Server 2 hosts 1 to n workers
+### Customization
 
-  
+- Copy / clone this repo locally
 
-In this example, we will assume that server 1 is at ```"192.168.20.122"```
+- Before spreading files, your need to customize a minimal set of variables in the .env file : 
 
-  
-
-### Core (Scheduler)
-
-  
-
-- Connect to your "Server 1"
-
-- Create the core directory :
-
-    <pre>mkdir /opt/core</pre>
-
-- Populate this directory with :
-
-- the previously created ```"core_wallet.json"```
-
-- 2 files from this git repo : ```".env"``` and ```"core_std/docker-compose.yml"```
-
-  
-
-- Update some variables in the ```".env"``` file :
-
-| Variables|Value|
-|----------|-----|
-|PROD_CHAIN_ADAPTER_HOST | 192.168.20.122|
-|PROD_CHAIN_ADAPTER_PROTOCOL | http |
-|PROD_CHAIN_ADAPTER_PORT| 13010|
-|PROD_CORE_HOST|192.168.20.122|
-|PROD_CORE_PROTOCOL|http|
-|PROD_CORE_PORT|7001|
-|PROD_CHAIN_ADAPTER_PASSWORD| changeme|
-|PROD_CORE_WALLET_PASSWORD| changeme|
-|PROD_GRAFANA_ADMIN_PASSWORD| changeme|
-|PROD_MONGO_PASSWORD|changeme|
-|PROD_POOL_ADDRESS|0x3c611ad1cAe35D563a5567a04475B0c31503bf4B|
-
-  
-
-- Each password should be randmly generated.<br>
-
-- The ```"PROD_CORE_WALLET_PASSWORD"``` is the password of the ```"core_wallet.json"``` file<br>
-
-- The ```"PROD_POOL_ADDRESS"``` is resulting from the ```"iexec workerpool deploy"``` command
-
-- The ```"ORDER_PUBLISHER_REQUESTER_RESTRICT"``` is the address of the wallet is able to buy the orders.<br>
-
-If set to ```"0x000000000000000000000000000000000000000"```, any one can use you order an run task on your workerpool.
-
-  
-
-One combination can be :
-
-- set ```"ORDER_PUBLISHER_REQUESTER_RESTRICT"``` to some wallet you own
-
-- set ```"ORDER_PRICE"``` to ```0```.
-
-You will publish workerpool orders to run tasks as free, but only for your wallet.<br>
-
-No one (but you) will be able to use you workerpool, and you will not have to bower with RLC staking.
-
-If the ```"IEXEC_WORKER_OVERRIDE_AVAILABLE_CPU_COUNT"``` directive is removed, the service will automatically take up to n-1 available CPUs in the machine.
-
-- When you're satistied by your configuration :
-
-```"docker-compose up -d"```
-
-  
-
-- You can check 2 services:
-
-- Blockchain Adapter as configuration manager :
-
-```"http://192.168.20.122:13010/config/chain"```
-
-- Core status :
-
-```"http://192.168.20.122:7001/metrics"```
-
-  
-
-Both of then return a json file (metrics and configuration).
-
-  
-
-Congratulations, you know how to run a scheduler.
-
-Let's add a worker to be fully functional
-
-  
-
-### Worker
-
-  
-
-You may create as many workers as you want, on the same server or one different one.
-
-- Connect to "Server 2"
-
-- Create the worker directory :
-
-<pre>mkdir /opt/worker</pre>
-
-- Populate this directory with :
-
-- 2 files from this git repo : ```".env"``` and ```"worker_std/docker-compose.yml"```
-
-- Create a new wallet with the same procedure used for the core.<br>
-
-- Each worker will have its own wallet.
-
-<pre>iexec wallet create --keystoredir $PWD
-
-mv UTC--* worker_wallet.json
-
+<pre>
+PROD_CHAIN_ADAPTER_PASSWORD
+PROD_GRAFANA_ADMIN_PASSWORD
+PROD_MONGO_PASSWORD
+PROD_CORE_WALLET_PASSWORD
+PROD_WALLET_PASSWORD
+SCONTAIN_REGISTRY_USERNAME
+SCONTAIN_REGISTRY_PASSWORD
+PROD_CORE_HOST
+PROD_CHAIN_ADAPTER_HOST
+PROD_GRAFANA_HOST
+WORKER_AVAILABLE_CPU
+PROD_POOL_ADDRESS
 </pre>
 
-- Stake some RLC to this wallet (if orders are not set to 0)
+See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
 
-- Reuse the core ```".env"``` file
+Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. For Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
 
-- set your ```"WORKER_NAME"```, should be unique.
+You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core%20(Scheduler)%20Registration). 
 
-- set the ```"PROD_WALLET_PASSWORD"``` to the wallet's password of this worker.
 
-- You can remove the ```"#####<Core config>"``` parts
+### Core (Scheduler) service deployment
+
+We will copy files and start the core services onto the Core server : 
+
+- Copy the customized .env and core directory in the ```"/opt"``` directory (or somewhere you'd rather install the core services)
+
+- Copy the previously created ```"core_wallet.json"``` into ```"/opt/core/wallet.json"```  
+
+- For security issues, you *could* delete the worker-specific part in the .env file
+
+- Start the core services with ```"docker-compose up -d"``` from the core directory
+
+- You can check 3 services:
+
+- Blockchain Adapter exposes the blockchain configuration :
+
+```"http://$PROD_CHAIN_ADAPTER_HOST:13010/config/chain"```
+
+- Core metrics :
+
+```"http://$PROD_CORE_HOST:7001/metrics"```
+
+- Grafana (core) metrics dashboard :
+
+```"http://$PROD_CORE_HOST:7000/"```
+
+  
+Congratulations, you know how to run a scheduler.
+
+Let's add a worker to complete the workerpool. 
 
   
 
-- Start your worker :
+### Worker service deployment
 
-```"docker-compose up -d"```
+You may create as many workers as you want by repeating and adapting all the worker-specific procedures (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
 
+We will copy files and start the worker services onto the Worker server : 
+
+- Copy the customized .env and worker directory in the ```"/opt"``` directory (or somewhere you'd rather install the worker services)
+
+- Copy the previously created ```"worker_wallet.json"``` into ```"/opt/worker/wallet-0.json"```  
+
+- For security issues, you could delete the core-specific part in the .env file
+
+- Start the worker services with ```"docker-compose up -d"``` from the worker directory
   
 
 # Status checking
 
-- Reload the core status page, you should see 1 alive worker.
+## Worker should join the workerpool 
 
-    <pre> curl http://192.168.20.122:7001/metrics
+- Reload the core pages, you should see 1 alive worker.
 
-    </pre>
+```"http://$PROD_CORE_HOST:7001/metrics"```
 
-- You can also see the workerpool orders published on the marketplace, this is done by the order-publisher-std service in the core docker-compose file.
+```"http://$PROD_CORE_HOST:7000/"```
 
-    <pre>iexec orderbook workerpool 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --requester 0x0123456789000000000000000000000000000000
-    
-    ℹ Using chain bellecour [chainId: 134]
-    
-    ℹ Workerpoolorders details (1 to 1 of 1):
-    
-    -
-    orderHash: 0x8baea41297c249255ea9bb1584fb0093b1319ff253171d364151da5816576341
- 
-    price: 0   
-    remaining: 1
-    category: 0
-    requesterrestrict: 0x0123456789000000000000000000000000000000
-    ✔ No more results
-    ℹ Trade in the browser at https://market.iex.ec
-    
-    </pre>
+## The Core server should publish workerpool orders
 
+The order-publisher-std service should publish workerpool orders on the marketplace (within some minutes). You can check those orders by running an iExec CLI command inside this container : <pre>docker-compose exec -T "order-publisher-std" sh -c 'iexec orderbook workerpool "$WORKERPOOL" --chain "$CHAIN" --tag "$TAG"'</pre> 
+
+You can check the service logs to see orders being published : <pre>docker-compose logs "order-publisher-std"</pre>
   
 
-# Order Management
+## Order manual management
 
 - Have a look at the [CLI Documentation](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md#SDK-CLI-for-Workerpools)
 - Basically, you can restric who can use you workerpool by publishing specific a workerpool order
@@ -377,13 +291,15 @@ mv UTC--* worker_wallet.json
   </pre>
 
 
-# Workerpool enforcement
-## Workers Whitelisting
-- You can whitelist all the worker's wallet allowed to connect to your scheduler
-  - Edit the ```"docker-compose.yml"``` file on the scheduler server
-  - Add a new environment variable named ```"IEXEC_WORKERS_WHITELIST"``` for the ```"core"``` service
-  <pre>...
-  IEXEC_WORKERS_WHITELIST="0x0111111111000000000000000000000000000000,0x0222222222000000000000000000000000000000,0x0333333333000000000000000000000000000000"
-  ...
-  </pre>
-  - Restart the ```"core"``` docker service
+# Going further (unsupported yet)
+
+This tutorial doesn't go into further support for an HTTP reverse proxy nor an HTTPS one nor even TEE tasks. But such enhancements would come by copying more files at the deployment stage (see the sub-directories under features directory). 
+
+It basicly works by:
+1. copying the files to the Worker / Core server 
+1. adapting some variables used in thoses new compose files
+1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-rev-proxy-http.yml up -d"``` or (for Advanced users) fusionning compose files properly. 
+
+Some feature-specific operations might be necessary like install the scone SGX drivers in order to run TEE tasks. 
+
+Some features can be combined (HTTPS + TEE) but some obviously can not (HTTP AND HTTPS). 

@@ -1,0 +1,63 @@
+version: '3.4'
+
+
+
+#
+## EXPERIMENTAL NOT TESTED EVER
+#
+
+
+
+volumes:
+    nginxconf:
+    nginxcerts:
+    nginxvhost:
+    nginxhtml:
+    companioncerts:
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.0
+    container_name: nginx-proxy
+    volumes:
+      - nginxconf:/etc/nginx/conf.d
+      - nginxvhost:/etc/nginx/vhost.d
+      - nginxhtml:/usr/share/nginx/html
+      - nginxcerts:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:2.2
+    environment:
+      - DEFAULT_EMAIL=admins@your.domain
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - nginxconf:/etc/nginx/conf.d
+      - nginxvhost:/etc/nginx/vhost.d
+      - nginxhtml:/usr/share/nginx/html
+      - nginxcerts:/etc/nginx/certs:rw
+      - companioncerts:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    depends_on:
+      - nginx-proxy
+
+
+  core:
+    environment:
+      - VIRTUAL_HOST=$PROD_CORE_HOST
+      - VIRTUAL_PORT=13000
+
+  grafana:
+    environment:
+      - VIRTUAL_HOST=$PROD_GRAFANA_HOST
+      - VIRTUAL_PORT=3000
+      
+  blockchain-adapter:
+    environment:
+      - VIRTUAL_HOST=$PROD_CHAIN_ADAPTER_HOST
+      - VIRTUAL_PORT=13010
