@@ -92,24 +92,24 @@ $ cat chain.json
 
 - Create a wallet for you scheduler (keep the core's wallet password safe):
 
-<pre>
-    iexec wallet create --keystoredir $PWD 
-    mv UTC--* core_wallet.json
-</pre>
+```console
+$ iexec wallet create --keystoredir $PWD 
+$ mv UTC--* core_wallet.json
+```
 
 - Optionally, instead of creating a new wallet, you can use an existing one or import your private key with the command:
 
-<pre>
-    iexec wallet import your_private_key 
-</pre>
+```console
+$ iexec wallet import your_private_key
+```
 
     
 - Create a wallet for you worker (keep the worker's wallet password safe):
 
-<pre>
-    iexec wallet create --keystoredir $PWD 
-    mv UTC--* worker_wallet.json
-</pre>
+```console
+$ iexec wallet create --keystoredir $PWD 
+$ mv UTC--* worker_wallet.json
+```
 
 
 /!\ Make to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsability to save and protect thoses files and associated passwords even on the servers. 
@@ -117,9 +117,9 @@ $ cat chain.json
 
 - Localy initialize you workerpool registration:
 
-<pre>
-    iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
-</pre>
+```console
+$ iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
+```
 
   
 
@@ -128,12 +128,12 @@ $ cat chain.json
 - Make sure the "owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
 
 <pre>
-    ./$ jq .workerpool iexec.json 
-        
-    "workerpool": {
-        "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
-        "description": "my-workerpool"
-    }
+$ jq .workerpool iexec.json 
+    
+"workerpool": {
+    "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
+    "description": "my-workerpool"
+}
 </pre>
 
   
