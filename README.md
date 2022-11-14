@@ -307,7 +307,7 @@ This tutorial doesn't go into further support for more features like the sub-dir
 Although not fully supported, those features basicly work by:
 1. copying the files to the Worker and/or Core server (see ```$ROLE/docker-compose-${FEATURE}.yml``` files)
 1. adapting some variables used in thoses new compose files (see ```$ROLE/.env-$FEATURE``` files)
-1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml up -d"``` or fusionning compose files properly (for Advanced users). 
+1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml <compose command and args>"``` or fusionning compose files properly (for Advanced users). 
 
 Some feature-specific operations might be necessary. 
 
