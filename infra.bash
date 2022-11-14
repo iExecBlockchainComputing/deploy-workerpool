@@ -53,7 +53,6 @@ function rm_value {
 }
 rm -rf core/*wallet* worker/*wallet* {core,worker}/{jenkins.groovy,menage.bash,scripts,volumes.env}
 rm_value PASSWORD 
-rm_value USERNAME yourlogin
 
 echo "Anonymisation"
 # Anonymiser core et worker

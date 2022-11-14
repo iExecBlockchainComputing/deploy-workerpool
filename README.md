@@ -199,8 +199,6 @@ Example using the iexec CLI :
     PROD_MONGO_PASSWORD
     PROD_CORE_WALLET_PASSWORD
     PROD_WALLET_PASSWORD
-    SCONTAIN_REGISTRY_USERNAME
-    SCONTAIN_REGISTRY_PASSWORD
     PROD_CORE_HOST
     PROD_CHAIN_ADAPTER_HOST
     PROD_GRAFANA_HOST
@@ -210,7 +208,7 @@ Example using the iexec CLI :
 
 See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
 
-Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. For Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
+Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
 
 You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). For your own convenience, adapting the GRAFANA_HOME_NAME might be good to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
   
@@ -306,13 +304,41 @@ You can check the service logs to see orders being published : <pre>docker-compo
 
 # Going further (unsupported yet)
 
-This tutorial doesn't go into further support for an HTTP reverse proxy nor an HTTPS one nor even TEE tasks. But such enhancements would come by copying more files at the deployment stage (see the sub-directories under features directory). 
+This tutorial doesn't go into further support for more features like the sub-directories under features directory.  
 
-It basicly works by:
-1. copying the files to the Worker / Core server 
-1. adapting some variables used in thoses new compose files
-1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-rev-proxy-http.yml up -d"``` or (for Advanced users) fusionning compose files properly. 
+Although not fully supported, those features basicly work by:
+1. copying the files to the Worker and/or Core server (see $ROLE/docker-compose-${FEATURE}.yml files)
+1. adapting some variables used in thoses new compose files (see $ROLE/.env-$FEATURE files)
+1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml up -d"``` or fusionning compose files properly (for Advanced users). 
 
-Some feature-specific operations might be necessary like install the scone SGX drivers in order to run TEE tasks. 
+Some feature-specific operations might be necessary. 
 
 Some features can be combined (HTTPS + TEE) but some obviously can not (HTTP AND HTTPS). 
+
+## Reverse-proxy with HTTP
+
+It helps not dealing with unusual ports but instead, offers some DNS names customization. 
+
+Copy files and add the environment variable PROD_GRAFANA_HOST for the Core services. 
+
+From the core service, you should, as a security issue, also remove from core/docker-compose.yml the ports redirections since the reverse-proxy is here for it. 
+      - 7001:13000
+      - 7000:3000
+      - 13010:13010
+
+## Reverse-proxy with HTTPS
+
+Same as [Reverse-proxy with HTTP](#Reverse-proxy-with-HTTP) but the Nginx reverse-proxy will also use Letsencrypt to generate HTTPS certificates for the DNS names so those DNS names must be public and you should provide a valid administrators email address. 
+
+## TEE 
+
+In order to provide the SGX Scone device (/dev/isgx), you should install the Scone SGX drivers on the Worker server : 
+<pre>
+    curl -fssl https://raw.githubusercontent.com/SconeDocs/SH/master/install_sgx_driver.sh | bash
+</pre>
+
+There also are 2 mandatory variables which will make the worker able to download the pre and post compute images : for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
+
+You may also need to read the [Scontain documentation](https://sconedocs.github.io/). 
+
+When the worker service starts, pay attention to its logs and check if the SGX mode is correctly detected.

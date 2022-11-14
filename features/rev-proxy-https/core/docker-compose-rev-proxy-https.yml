@@ -49,6 +49,8 @@ services:
 
   core:
     environment:
+      - IEXEC_CORE_CHAIN_ADAPTER_PORT=443
+      - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=https
       - VIRTUAL_HOST=$PROD_CORE_HOST
       - VIRTUAL_PORT=13000
 

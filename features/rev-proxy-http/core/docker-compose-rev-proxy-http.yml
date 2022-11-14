@@ -19,6 +19,7 @@ services:
 
   core:
     environment:
+      - IEXEC_CORE_CHAIN_ADAPTER_PORT=80
       - VIRTUAL_HOST=$PROD_CORE_HOST
       - VIRTUAL_PORT=13000
 

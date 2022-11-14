@@ -41,7 +41,11 @@ Exécuter infra.bash
 4. Retirer le SGX (c'est plus simple que de compter sur le fallback)
       - IEXEC_WORKER_SGX_DRIVER_MODE=NONE
 
-5. Désactiver les log de dev : 
+5. Déplacer les variables liée à Scontain (SGX) (à faire aussi dans vars_to_customize) vers la feature TEE : 
+      - IEXEC_WORKER_SCONTAIN_REGISTRY_USERNAME=$SCONTAIN_REGISTRY_USERNAME
+      - IEXEC_WORKER_SCONTAIN_REGISTRY_PASSWORD=$SCONTAIN_REGISTRY_PASSWORD
+
+6. Désactiver les log de dev : 
       - IEXEC_DEVELOPER_LOGGER_ENABLED=False
 
 # Pour le reverse-proxy HTTP
@@ -82,4 +86,4 @@ lister les pré-requis système sur ansible pour les worker de génération en q
 Lister et expliquer quoi mettre dans les vars_to_customize.txt et supprimer le fichier. 
 
 expliquer la bidouille pour ajouter les options (rev-proxy-http, rev-proxy-https, tee) 
-# TODO: scripter ces ajouts 
+# TODO: scripter ces ajouts pour une fusion plus intuitive
