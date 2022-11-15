@@ -36,3 +36,5 @@ services:
     volumes:
       - ./wallet.json:/wallets/wallet.json
     restart: unless-stopped
+    depends_on:
+      - core

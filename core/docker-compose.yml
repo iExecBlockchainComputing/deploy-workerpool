@@ -49,6 +49,7 @@ services:
       - "7001:13000"
     depends_on:
       - mongo
+      - blockchain-adapter
     restart: unless-stopped
 
   mongo:
@@ -138,6 +139,8 @@ services:
     ports:
       - 13010:13010
     restart: unless-stopped
+    depends_on:
+      - blockchain-adapter-mongo
 
   blockchain-adapter-mongo:
     image: library/mongo:4.4
@@ -191,3 +194,5 @@ services:
     volumes:
       - ./wallet.json:/wallets/wallet.json
     restart: unless-stopped
+    depends_on:
+      - core
