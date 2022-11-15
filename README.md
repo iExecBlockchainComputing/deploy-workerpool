@@ -42,22 +42,20 @@ The folllowing considerations must be taken into account:
 
 # Requirements
 
-Server (minimal)
+Workerpool servers:
 
-- server with 2 CPU, 4 GB of RAM
+- minimal: 2 servers with 2 CPU, and 4 GB of RAM each
 
-Server (minimal recommended)
+- minimal recommended: 2 servers with 4 CPU, and 16 GB of RAM each
 
-- server with 4 CPU, 16 GB of RAM
+- OS recommended: Ubuntu 20.04, it should not be an issue to use another one but you might need to adapt some configuration **on your own**
+
+- Packages: docker and docker-compose with the standard installation steps provided on https://docs.docker.com 
 
  
-Software
+Software for deployment an registration (basic installation **on your own**):
 
-- NodeJS
-
-- [iExec SDK](https://www.npmjs.com/package/iexec)
-
-- Docker & Docker-compose
+- [iExec SDK CLI](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md)
 
 
 
@@ -223,7 +221,7 @@ You may also want to customize some other variables for further uses but this is
 
 # Deployment
 
-- Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**) 
+- Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**). 
 
 - The Core server will host the Core services (scheduler). It should have a static IP or a DNS name.
 
