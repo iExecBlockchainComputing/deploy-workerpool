@@ -36,7 +36,7 @@ The folllowing considerations must be taken into account:
 
   
 
-- Services must be connected to the [Bellecour](https://bellecour.iex.ec) iExec sidechain.
+- Services must be connected to the [https://bellecour.iex.ec](https://blockscout-bellecour.iex.ec/) iExec sidechain.
 
   
 
