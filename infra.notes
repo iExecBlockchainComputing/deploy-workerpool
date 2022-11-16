@@ -1,54 +1,53 @@
 Exécuter infra.bash
 
 # Affinage du core : 
-1. Déplacer l'order-publisher (tee) du core dans un autre compose : tee/core/docker-compose-tee.yml
+1. Déplacer l'order-publisher (tee) du core dans un autre compose : tee/core/docker-compose-tee.yml (scripted)
 
-2. Corriger les env pour joindre le CHAIN_ADAPTER
-      - IEXEC_CORE_CHAIN_ADAPTER_HOST=$PROD_CHAIN_ADAPTER_HOST
+2. Corriger les env pour joindre le CHAIN_ADAPTER (scripted)
       - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=https
       - IEXEC_CORE_CHAIN_ADAPTER_PORT=443
     à
       - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=http
       - IEXEC_CORE_CHAIN_ADAPTER_PORT=13010
 
-3. (détail) modifier dans le order-publisher-std : 
+3. (détail) modifier dans le order-publisher-std : (integrated in staging, v7?)
       - PUBLISH_PERIOD=30
     à
-      - PUBLISH_PERIOD=1
+      - PUBLISH_PERIOD=3
 
-4. Corriger l'URL du core pour l'order-publisher : (#TODO: faire ça aussi dans stack-deploy, c'est logique en fait)
+4. Corriger l'URL du core pour l'order-publisher : (integrated in staging, v7?)
       - CORE_URL=https://$PROD_CORE_HOST
     à
       - CORE_URL=http://core:13000
 
-5. Changer le GRAFANA_HOME_NAME en $GRAFANA_HOME_NAME  et ajouter 'GRAFANA_HOME_NAME=My workerpool description' au .env +  note au README
+5. Changer le GRAFANA_HOME_NAME en $GRAFANA_HOME_NAME  et ajouter 'GRAFANA_HOME_NAME=My workerpool description' au .env +  note au README (integrated in staging, v7?)
       
 # Affinage du worker : 
-1. Corriger les env pour joindre le core (faudra mettre l'IP de la machine du core dans le nom)
+1. Corriger les env pour joindre le core (faudra mettre l'IP de la machine du core dans le nom) (scripted)
       - IEXEC_CORE_PORT=443
       - IEXEC_CORE_PROTOCOL=https
     à
       - IEXEC_CORE_PORT=7001
       - IEXEC_CORE_PROTOCOL=http
 
-2. (détail) Virer le commentaire dans 
+2. (détail) Virer le commentaire dans (skiped)
       - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory and should come with individualize.sh}
     à
       - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory}
 
-3. Détail : changer le WORKER_NAME de 1 à 0 (pour coller avec le nom du wallet)
+3. Détail : changer le WORKER_NAME de 1 à 0 (pour coller avec le nom du wallet) (skiped)
 
-4. Retirer le SGX (c'est plus simple que de compter sur le fallback)
+4. Retirer le SGX (c'est plus simple que de compter sur le fallback) (scripted)
       - IEXEC_WORKER_SGX_DRIVER_MODE=NONE
 
-5. Déplacer les variables liée à Scontain (SGX) (à faire aussi dans vars_to_customize) vers la feature TEE : 
+5. Déplacer les variables liée à Scontain (SGX) (à faire aussi dans vars_to_customize) vers la feature TEE : (semi-scripted)
       - IEXEC_WORKER_SCONTAIN_REGISTRY_USERNAME=$SCONTAIN_REGISTRY_USERNAME
       - IEXEC_WORKER_SCONTAIN_REGISTRY_PASSWORD=$SCONTAIN_REGISTRY_PASSWORD
 
-6. Désactiver les log de dev : 
+6. Désactiver les log de dev :  (scripted)
       - IEXEC_DEVELOPER_LOGGER_ENABLED=False
 
-# Pour le reverse-proxy HTTP
+# Pour le reverse-proxy HTTP (skiped)
 Vérifier les ports et variables pour le RP nginx HTTP dans rev-proxy-http/core/docker-compose.yml : 
     Ajouter au .env + README la variable core-pecific PROD_GRAFANA_HOST=v7.prod-main-pool.bellecour.yourdomain
 Dans le core/docker-compose.yml : 
@@ -60,7 +59,7 @@ Dans le worker/docker-compose.yml :
       - IEXEC_CORE_PORT=80
       - IEXEC_CORE_PROTOCOL=http
       
-# Pour le reverse-proxy HTTPS
+# Pour le reverse-proxy HTTPS (skiped)
 Vérifier les ports et variables pour le RP nginx HTTPS dans rev-proxy-https/core/docker-compose.yml : 
     Ajouter au .env + README la variable core-pecific PROD_GRAFANA_HOST=v7.prod-main-pool.bellecour.yourdomain
 Dans le core/docker-compose.yml : 
@@ -75,6 +74,9 @@ Dans le worker/docker-compose.yml :
 # Pour le TEE 
 Drivers SGX dans worker : 
       - IEXEC_WORKER_SGX_DRIVER_MODE=LEGACY
+Connection à Scontain : 
+      - IEXEC_WORKER_SCONTAIN_REGISTRY_USERNAME=${SCONTAIN_REGISTRY_USERNAME:?}
+      - IEXEC_WORKER_SCONTAIN_REGISTRY_PASSWORD=${SCONTAIN_REGISTRY_PASSWORD:?}
 
 //MAJ le README
 ajouter le core/wallet.json

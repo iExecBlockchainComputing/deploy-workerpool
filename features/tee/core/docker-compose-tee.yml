@@ -1,40 +1,30 @@
-version: '3.4'
-
-
-
-#
-## EXPERIMENTAL NOT TESTED EVER
-#
-
-
-
 services:
   order-publisher:
-    image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
-    environment:      
-      - CORE_URL=https://$PROD_CORE_HOST
-      - MARKET_URL=https://$MARKET_API_HOST
-      - CHAIN=$CHAIN
-      - PUBLISH_PERIOD=30
-      - CHECK_SLEEP_TIME=30
-      - WALLETPASSWORD=$PROD_CORE_WALLET_PASSWORD
-      - DAEMONIZE=true
-      - IS_GPU_POOL=false
-      - MAX_ORDER_NUMBER=3
-
-      - WORKERPOOL=$PROD_POOL_ADDRESS
-      - WORKERPOOL_PRICE=$WORKERPOOL_PRICE
-      - WORKERPOOL_PRICE_MIN=
-      - WORKERPOOL_PRICE_MAX=
-      - VOLUME=1
-      - CATEGORY=0
-      - TRUST=1
-      - TAG=0x0000000000000000000000000000000000000000000000000000000000000001
-      - APP_RESTRICT=
-      - DATASET_RESTRICT=
-      - REQUESTER_RESTRICT=$ORDER_PUBLISHER_REQUESTER_RESTRICT
-    volumes:
-      - ./wallet.json:/wallets/wallet.json
-    restart: unless-stopped
     depends_on:
-      - core
+    - core
+    environment:
+    - CORE_URL=http://core:13000
+    - MARKET_URL=https://$MARKET_API_HOST
+    - CHAIN=$CHAIN
+    - PUBLISH_PERIOD=1
+    - CHECK_SLEEP_TIME=30
+    - WALLETPASSWORD=$PROD_CORE_WALLET_PASSWORD
+    - DAEMONIZE=true
+    - IS_GPU_POOL=false
+    - MAX_ORDER_NUMBER=${MAX_ORDER_NUMBER:-3}
+    - WORKERPOOL=$PROD_POOL_ADDRESS
+    - WORKERPOOL_PRICE=$WORKERPOOL_PRICE
+    - WORKERPOOL_PRICE_MIN=
+    - WORKERPOOL_PRICE_MAX=
+    - VOLUME=1
+    - CATEGORY=0
+    - TRUST=1
+    - TAG=0x0000000000000000000000000000000000000000000000000000000000000001
+    - APP_RESTRICT=
+    - DATASET_RESTRICT=
+    - REQUESTER_RESTRICT=$ORDER_PUBLISHER_REQUESTER_RESTRICT
+    image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
+    restart: unless-stopped
+    volumes:
+    - ./wallet.json:/wallets/wallet.json
+version: '3.4'

@@ -1,44 +1,38 @@
-version: '3.6'
-
 networks:
   worker-net:
     name: worker-net
-
 services:
   worker:
-    image: $DOCKER_REGISTRY/iexec-worker:$WORKER_TAG
     container_name: $WORKER_NAME
     environment:
-      - IEXEC_DEVELOPER_LOGGER_ENABLED=False
-      - IEXEC_WORKER_DOCKER_NETWORK_NAME=worker-net
-      - IEXEC_CORE_HOST=$PROD_CORE_HOST
-      - IEXEC_CORE_PORT=7001
-      - IEXEC_CORE_PROTOCOL=http
-      - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory}
-      - IEXEC_WORKER_WALLET_PASSWORD=$PROD_WALLET_PASSWORD
-      # WORKER_NAME is used for child containers names and for passing results from compute to post-compute. The folder $IEXEC_WORKER_BASE_DIR/$IEXEC_WORKER_NAME is then mounted in both compute ans post-compute containers.
-      # The worker service reads things in it as well. Better keep things simple and use the same folder on host and all 3 containers.  
-      - IEXEC_WORKER_NAME=$WORKER_NAME
-      - IEXEC_WORKER_BASE_DIR=$RESULTS_DIR
-      
-      - IEXEC_WORKER_OVERRIDE_BLOCKCHAIN_NODE_ADDRESS=$CHAIN_URL
-
-      - IEXEC_WORKER_OVERRIDE_AVAILABLE_CPU_COUNT=${WORKER_AVAILABLE_CPU:-} 
-
-      - IEXEC_CORE_GRAYLOG_HOST=
-      - IEXEC_WORKER_GPU_ENABLED=False
-      - IEXEC_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
-      - IEXEC_GAS_PRICE_CAP=$GAS_PRICE_CAP
-      - IEXEC_WORKER_SGX_DRIVER_MODE=NONE
-      - IEXEC_WORKER_DOCKER_REGISTRY_ADDRESS_1=${REGISTRY_ADDRESS:-}
-      - IEXEC_WORKER_DOCKER_REGISTRY_USERNAME_1=${REGISTRY_USERNAME:-}
-      - IEXEC_WORKER_DOCKER_REGISTRY_PASSWORD_1=${REGISTRY_PASSWORD:-}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - $RESULTS_DIR/$WORKER_NAME:$RESULTS_DIR/$WORKER_NAME
-      - ./$WALLET:/$WALLET:rw
-    restart: unless-stopped
+    - IEXEC_DEVELOPER_LOGGER_ENABLED=False
+    - IEXEC_WORKER_DOCKER_NETWORK_NAME=worker-net
+    - IEXEC_CORE_HOST=$PROD_CORE_HOST
+    - IEXEC_CORE_PORT=7001
+    - IEXEC_CORE_PROTOCOL=http
+    - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory and should come with
+      individualize.sh}
+    - IEXEC_WORKER_WALLET_PASSWORD=$PROD_WALLET_PASSWORD
+    - IEXEC_WORKER_NAME=$WORKER_NAME
+    - IEXEC_WORKER_BASE_DIR=$RESULTS_DIR
+    - IEXEC_WORKER_OVERRIDE_BLOCKCHAIN_NODE_ADDRESS=$CHAIN_URL
+    - IEXEC_WORKER_OVERRIDE_AVAILABLE_CPU_COUNT=${WORKER_AVAILABLE_CPU:-}
+    - IEXEC_CORE_GRAYLOG_HOST=
+    - IEXEC_WORKER_GPU_ENABLED=False
+    - IEXEC_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
+    - IEXEC_GAS_PRICE_CAP=$GAS_PRICE_CAP
+    - IEXEC_WORKER_SGX_DRIVER_MODE=NONE
+    - IEXEC_WORKER_DOCKER_REGISTRY_ADDRESS_1=${REGISTRY_ADDRESS:-}
+    - IEXEC_WORKER_DOCKER_REGISTRY_USERNAME_1=${REGISTRY_USERNAME:-}
+    - IEXEC_WORKER_DOCKER_REGISTRY_PASSWORD_1=${REGISTRY_PASSWORD:-}
+    image: $DOCKER_REGISTRY/iexec-worker:$WORKER_TAG
     networks:
       worker-net:
         aliases:
-          - worker
+        - worker
+    restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - $RESULTS_DIR/$WORKER_NAME:$RESULTS_DIR/$WORKER_NAME
+    - ./$WALLET:/$WALLET:rw
+version: '3.6'
