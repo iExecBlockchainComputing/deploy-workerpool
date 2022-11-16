@@ -72,7 +72,7 @@ function get_vars {
 
     for VAR in $(cat "${THIS}_vars") ; do 
         # si la variable est utilisée dans le docker-compose.yml on la traite (sinon, on n'en fait rien)
-        if grep -q "$VAR" "${THIS}/docker-compose.yml"; then 
+        if grep -q "\${\?$VAR" "${THIS}/docker-compose.yml"; then 
             # si pas déjà intégrée au common on la traite (sinon, on n'en fait rien)
             if ! grep -q "^$VAR=" common.env; then 
                 VAR_VALUE="$(grep "^$VAR=" "${THIS}/.env" | tail -n-1)" # retourne la ligne VAR=VALUE entière 
@@ -114,5 +114,7 @@ ls -l .env {core,worker}/.env
 # Adaptation manuelles du .env : 
 # WALLET=wallet-0.json descendu dans la section worker
 # TODO: renommer les variables en WORKER_WALLET et WORKER_WALLET_PASSWORD dans stack-deploy
+
+./infra-copy-compose-files.py
 
 echo fini
