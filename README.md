@@ -52,6 +52,8 @@ Workerpool servers:
 
 - Packages: docker and docker-compose with the standard installation steps provided on https://docs.docker.com 
 
+- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). 
+
  
 Software for deployment an registration (basic installation **on your own**):
 
@@ -223,9 +225,9 @@ You may also want to customize some other variables for further uses but this is
 
 - Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**). 
 
-- The Core server will host the Core services (scheduler). It should have a static IP or a DNS name.
+- The Core server will host the Core services (scheduler). It should have a static IP or a DNS name for commminucations from the worker. 
 
-- The Worker server will host the worker services. 
+- The Worker server will host the worker services. It should not be exposed on the internet for security reasons. 
 
 
 ## Core (Scheduler) service deployment
