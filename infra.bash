@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash 
 
 echo "Init and reset"
 cd "$(dirname "$0")"
@@ -105,7 +105,7 @@ $(cat worker.env)
 
 EOF
 
-rm core/.env worker/.env core_vars worker_vars core.env worker.env common.env
+rm {core,worker}/.env{,.bash} core_vars worker_vars core.env worker.env common.env
 
 ln -s ../.env core/
 ln -s ../.env worker/
