@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 echo "Init and reset"
 cd "$(dirname "$0")"
@@ -60,6 +60,7 @@ rm_value PROD_CORE_HOST
 rm_value PROD_CHAIN_ADAPTER_HOST
 rm_value PROD_POOL_ADDRESS 0xyour-workerpool-address
 rm_value WORKER_AVAILABLE_CPU 1
+rm_value GRAFANA_HOME_NAME "My workerpool description"
 
 echo "Remaniement des .env"
 # Trier les variables communes ou core-specific ou worker-specific
