@@ -1,51 +1,19 @@
 Exécuter infra.bash
-
-# Affinage du core : 
-1. Déplacer l'order-publisher (tee) du core dans un autre compose : tee/core/docker-compose-tee.yml (scripted)
-
-2. Corriger les env pour joindre le CHAIN_ADAPTER (scripted)
-      - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=https
-      - IEXEC_CORE_CHAIN_ADAPTER_PORT=443
-    à
-      - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=http
-      - IEXEC_CORE_CHAIN_ADAPTER_PORT=13010
-
-3. (détail) modifier dans le order-publisher-std : (integrated in staging, v7?)
-      - PUBLISH_PERIOD=30
-    à
-      - PUBLISH_PERIOD=3
-
-4. Corriger l'URL du core pour l'order-publisher : (integrated in staging, v7?)
-      - CORE_URL=https://$PROD_CORE_HOST
-    à
-      - CORE_URL=http://core:13000
-
-5. Changer le GRAFANA_HOME_NAME en $GRAFANA_HOME_NAME  et ajouter 'GRAFANA_HOME_NAME=My workerpool description' au .env +  note au README (integrated in staging, v7?)
       
 # Affinage du worker : 
-1. Corriger les env pour joindre le core (faudra mettre l'IP de la machine du core dans le nom) (scripted)
-      - IEXEC_CORE_PORT=443
-      - IEXEC_CORE_PROTOCOL=https
-    à
-      - IEXEC_CORE_PORT=7001
-      - IEXEC_CORE_PROTOCOL=http
 
-2. (détail) Virer le commentaire dans (skiped)
+1. (détail) Virer le commentaire dans worker/docker-compose.yml 
       - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory and should come with individualize.sh}
     à
       - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory}
 
-3. Détail : changer le WORKER_NAME de 1 à 0 (pour coller avec le nom du wallet) (skiped)
 
-4. Retirer le SGX (c'est plus simple que de compter sur le fallback) (scripted)
-      - IEXEC_WORKER_SGX_DRIVER_MODE=NONE
-
-5. Déplacer les variables liée à Scontain (SGX) (à faire aussi dans vars_to_customize) vers la feature TEE : (semi-scripted)
+2. Supprimer les variables liée à Scontain (SGX) (à faire aussi dans vars_to_customize) : (scripted)
       - IEXEC_WORKER_SCONTAIN_REGISTRY_USERNAME=$SCONTAIN_REGISTRY_USERNAME
       - IEXEC_WORKER_SCONTAIN_REGISTRY_PASSWORD=$SCONTAIN_REGISTRY_PASSWORD
 
-6. Désactiver les log de dev :  (scripted)
-      - IEXEC_DEVELOPER_LOGGER_ENABLED=False
+3. Vérifier ces mêmes variables dans la feature TEE (manual)
+
 
 # Pour le reverse-proxy HTTP (skiped)
 Vérifier les ports et variables pour le RP nginx HTTP dans rev-proxy-http/core/docker-compose.yml : 
@@ -74,7 +42,7 @@ Dans le worker/docker-compose.yml :
 # Pour le TEE 
 Drivers SGX dans worker : 
       - IEXEC_WORKER_SGX_DRIVER_MODE=LEGACY
-Connection à Scontain : 
+Connection à Scontain, variables obligatoires : 
       - IEXEC_WORKER_SCONTAIN_REGISTRY_USERNAME=${SCONTAIN_REGISTRY_USERNAME:?}
       - IEXEC_WORKER_SCONTAIN_REGISTRY_PASSWORD=${SCONTAIN_REGISTRY_PASSWORD:?}
 

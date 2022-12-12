@@ -18,7 +18,7 @@ services:
     image: $DOCKER_REGISTRY/iexec-blockchain-adapter-api:$BLOCKCHAIN_ADAPTER_TAG
     ports:
     - 13010:13010
-    restart: on-failure
+    restart: unless-stopped
     volumes:
     - ./wallet.json:/wallet.json
   blockchain-adapter-mongo:
@@ -28,7 +28,7 @@ services:
     expose:
     - 13012
     image: library/mongo:4.4
-    restart: on-failure
+    restart: unless-stopped
   blockchain-adapter-mongo-ui:
     container_name: blockchain-adapter-mongo-ui
     depends_on:
@@ -42,7 +42,7 @@ services:
     image: library/mongo-express:0.54
     ports:
     - 13013:13013
-    restart: on-failure
+    restart: unless-stopped
   core:
     container_name: core
     depends_on:
