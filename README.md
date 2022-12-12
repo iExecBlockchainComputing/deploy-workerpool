@@ -212,7 +212,7 @@ $ iexec account deposit "100000000" --wallet-file worker_wallet.json --keystored
     PROD_CHAIN_ADAPTER_HOST
     WORKER_AVAILABLE_CPU
     PROD_POOL_ADDRESS
-    
+    GRAFANA_HOME_NAME
 </pre>
 
 See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
