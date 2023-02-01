@@ -187,11 +187,11 @@ $ iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OT
 
   
 
-- Then stake this amount of RLC to the iExec account of the wallets
+- Then stake this amount of RLC to the iExec account of the wallets (core and worker)
 
 ```console
-$ iexec account deposit "100000000" --wallet-file core_wallet.json --keystoredir "$PWD"
-$ iexec account deposit "100000000" --wallet-file worker_wallet.json --keystoredir "$PWD"
+$ iexec account deposit 1 RLC --wallet-file core_wallet.json   --keystoredir "$PWD"
+$ iexec account deposit 1 RLC --wallet-file worker_wallet.json --keystoredir "$PWD"
 ```
 
   
@@ -220,7 +220,9 @@ See how those variables are used in */docker-compose.yml and find the detailed c
 Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
 
 You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). It might be good for your own convenience to adapt the GRAFANA_HOME_NAME to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
-  
+
+You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps you core service not read the blockchain from a too old point in time and save him efforts. When you deploy your workerpool, put a very recent block number, less than 20 blocks old. You can get the last mined block at https://blockscout-bellecour.iex.ec/blocks . It might happen that to core service is lost reading a too large amount of blocks from the blockchain and then, does not see new deals. In such a case, you need to turn of the core services, set a very fresh value in .env, reset some mongo documents : Configuration and ReplayConfiguration and then turn the core services on again. If you are not interested in the mongo historical data (it's like reseting completely your workerpool), you can just wipe the mongo volume with *docker-compose down -v*, set a fresh new CHAIN_LAST_BLOCK and *docker-compose up -d*. 
+
 
 # Deployment
 
