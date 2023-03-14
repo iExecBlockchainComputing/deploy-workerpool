@@ -65,7 +65,7 @@ NB: The worker server will most likely run many different docker images which wi
 $ docker image prune --all --force
 ```
 
-It is better to prune docker images when no task is running and to restart the worker service afterwards. If you do not want to restart the worker service, make sure not to delete pre-compute and post-compute images in case you run a TEE worker.
+It is better to prune docker images when no task is running and to restart the worker service afterwards. If you do not want to restart the worker service, make sure not to delete iexec-las, tee-worker-pre-compute and tee-worker-post-compute images in case you run a TEE worker.
 
 
 
