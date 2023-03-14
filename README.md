@@ -59,6 +59,14 @@ Software for deployment an registration (basic installation **on your own**):
 
 - [iExec SDK CLI](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md)
 
+NB: The worker server will most likely run many different docker images which will most likely consume a lot of disk space. You should manage this **on your own** with a scheduled task like cron and the command:
+
+```console
+$ docker image prune --all --force
+```
+
+It is better to prune docker images when no task is running and to restart the worker service afterwards. If you do not want to restart the worker service, make sure not to delete pre-compute and post-compute images in case you run a TEE worker.
+
 
 
 # Configuration
