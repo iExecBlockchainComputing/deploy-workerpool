@@ -2,17 +2,27 @@ networks:
   worker-net:
     name: worker-net
 services:
-  worker:
-    container_name: worker$WORKER_ID
+  scone-post-compute:
+    entrypoint: /bin/sh
+    image: $POST_COMPUTE_IMAGE
+    restart: unless-stopped
+    tty: true
+  scone-pre-compute:
+    entrypoint: /bin/sh
+    image: $PRE_COMPUTE_IMAGE
+    restart: unless-stopped
+    tty: true
+  worker_prod:
+    container_name: worker_prod-$WORKER_ID
     environment:
     - IEXEC_DEVELOPER_LOGGER_ENABLED=False
     - IEXEC_WORKER_DOCKER_NETWORK_NAME=worker-net
     - IEXEC_CORE_HOST=$PROD_CORE_HOST
-    - IEXEC_CORE_PORT=7001
-    - IEXEC_CORE_PROTOCOL=http
+    - IEXEC_CORE_PORT=443
+    - IEXEC_CORE_PROTOCOL=https
     - IEXEC_WORKER_WALLET_PATH=/${WALLET:?Wallet is mandatory}
     - IEXEC_WORKER_WALLET_PASSWORD=$PROD_WALLET_PASSWORD
-    - IEXEC_WORKER_NAME=worker$WORKER_ID
+    - IEXEC_WORKER_NAME=worker_prod-$WORKER_ID
     - IEXEC_WORKER_BASE_DIR=$RESULTS_DIR
     - IEXEC_WORKER_OVERRIDE_BLOCKCHAIN_NODE_ADDRESS=$CHAIN_URL
     - IEXEC_WORKER_OVERRIDE_AVAILABLE_CPU_COUNT=${WORKER_AVAILABLE_CPU:-}
@@ -24,6 +34,8 @@ services:
     - IEXEC_WORKER_DOCKER_REGISTRY_ADDRESS_1=${REGISTRY_ADDRESS:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_USERNAME_1=${REGISTRY_USERNAME:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_PASSWORD_1=${REGISTRY_PASSWORD:-}
+    healthcheck:
+      test: curl --fail http://localhost:13100/actuator/health || exit 1
     image: $DOCKER_REGISTRY/iexec-worker:$WORKER_TAG
     networks:
       worker-net:
@@ -32,6 +44,6 @@ services:
     restart: unless-stopped
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - $RESULTS_DIR/worker$WORKER_ID:$RESULTS_DIR/worker$WORKER_ID
+    - $RESULTS_DIR/worker_prod-$WORKER_ID:$RESULTS_DIR/worker_prod-$WORKER_ID
     - ./$WALLET:/$WALLET:rw
 version: '3.6'

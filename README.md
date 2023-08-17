@@ -20,7 +20,7 @@
 
 # Context
 
-This repository contains the necessary files to set up a scheduler (also known as core) and its workers.
+This repository contains the necessary files to set up a scheduler (also known as the core service) and its workers.
 
   
 
@@ -29,10 +29,6 @@ The folllowing considerations must be taken into account:
   
 
 - Only workepools for standard tasks (non TEE) are in the scope of this README.
-
-  
-
-- Services are exposed in HTTP by default, it is highly recommended configure SSL by installing the corresponding server certificates.
 
   
 
@@ -50,14 +46,14 @@ Workerpool servers:
 
 - OS recommended: Ubuntu 20.04, it should not be an issue to use another one but you might need to adapt some configuration **on your own**
 
-- Packages: docker and docker-compose with the standard installation steps provided on https://docs.docker.com 
+- Packages: docker and its compose plugin (compose V2 as a plugin for the ```"docker compose"``` command is recommended but it should with compose V1 as a package for the ```"docker-compose"``` command) with the standard installation steps provided on https://docs.docker.com 
 
-- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). 
+- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). Also, make sure the Core server can request LetsEncrypt certificates based on the ACME HTTP-01 challenge (see the letsencrypt service companion) which basicly means to provide this server a public IP address. 
 
  
 Software for deployment an registration (basic installation **on your own**):
 
-- [iExec SDK CLI](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md)
+- [iExec SDK CLI](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md), check your version with iexec -V and make sure that the major version is 8. 
 
 NB: The worker server will most likely run many different docker images which will most likely consume a lot of disk space. You should manage this **on your own** with a scheduled task like cron and the command:
 
@@ -83,18 +79,15 @@ $ iexec init --skip-wallet
 
   
 
-- Edit the "chain.json" file and change the "default" field from "viviani" to "bellecour"
+- Edit the "chain.json" file and make sure the "default" is set to "bellecour"
 ```console
 $ cat chain.json
 {
-    "default": "bellecour",
-    "chains": {
-    "goerli": {},
-    "viviani": {},
+  "default": "bellecour",
+  "chains": {
     "mainnet": {},
-    "bellecour": {},
-    "enterprise": {},
-    "enterprise-testnet": {}
+    "bellecour": {}
+  }
 }
 ```
 
@@ -116,7 +109,7 @@ $ mv   UTC--2022-11-14T19-26-19.749000000Z--af1ceea065f5b9c8961ead7bbaf4e9262167
 - Optionally, instead of creating a new wallet, you can use an existing one or import your private key with the command:
 
 ```console
-$ iexec wallet import your_private_key
+$ iexec wallet import <your_private_key>
 ```
 
     
@@ -130,20 +123,20 @@ $ mv   UTC--2022-11-14T19-27-56.277000000Z--d2e57b7121fc43169aab2e3dc37e4338ca58
 ```
 
 
-⚠ Make to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsability to save and protect thoses files and associated passwords even on the servers. 
+⚠ Make sure to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsability to save and protect thoses files and associated passwords even on the servers. 
   
 
 - Localy initialize you workerpool registration:
 
 ```console
-$ iexec workerpool init --wallet-file "core_wallet.json" --keystoredir "$PWD"
+$ iexec workerpool init --wallet-file "core_wallet.json" --keystoredir ./
 ```
 
   
 
 - Edit the "iexec.json" file and change the "workerpool.description" field from the 'my-workerpool' default value. This field will appear publicly on the blockchain and the marketplace.
 
-- Make sure the "owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
+- Make sure the "workerpool.owner" field of iexec.json file matches the "address" field of the "core_wallet.json" file.
 
 ```console
 $ jq .workerpool iexec.json 
@@ -151,6 +144,9 @@ $ jq .workerpool iexec.json
     "owner": "0x6DdF0Bf919f108376136a64219B395117229BaF6",
     "description": "my-workerpool"
 }
+
+$ jq .address core_wallet.json
+"6DdF0Bf919f108376136a64219B395117229BaF6"
 ```
 
   
@@ -158,7 +154,7 @@ $ jq .workerpool iexec.json
 - Register your workerpool on the blockchain to get its workerpool address:
 
 ```console
-$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
+$ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir ./
     
     ℹ Using chain bellecour [chainId: 134]
     
@@ -171,7 +167,7 @@ $ iexec workerpool deploy --wallet-file "core_wallet.json" --keystoredir "$PWD"
 ```
 
 
-Save your workerpool (deployment) address for later use (you might also find it in the deployed.json)
+Save your workerpool (deployment) address for later use (you might also find it in the deployed.json file)
   
 
 You may now consult the workerpool metadata by typing your workerpool address into the search area on the [explorer](https://explorer.iex.ec/bellecour/).
@@ -181,11 +177,10 @@ You may now consult the workerpool metadata by typing your workerpool address in
 Keep in mind that the workerpool address corresponds to your workerpool registration address and not the wallet owner address. 
 
  
-If using a free workerpool (workerpool orders with price = 0 RLC), you can jump to the next section ([Deployment](#Deployment)) by
-skiping puting and staking some RLC on the core's and worker's wallets (next step). 
+If you want to deploy a free workerpool (workerpool orders with price = 0 RLC), you can jump to the next section ([Customization](#Customization)). You don't need to stake some RLC on the core's and worker's wallets (the end of this section). 
   
 
-- First, put some RLC to the core's and worker's wallets using you favorite tool (metamask/iexec cli/...). Obviously, you need some RLC on another wallet for this.  
+- For a non-free workerpool, first, put some RLC to the core's and worker's wallets using you favorite tool (metamask/iexec cli/...). Obviously, you need some RLC on another wallet for this.  
 
 Example using the iexec CLI:
 
@@ -218,32 +213,35 @@ $ iexec account deposit 1 RLC --wallet-file worker_wallet.json --keystoredir "$P
     PROD_WALLET_PASSWORD
     PROD_CORE_HOST
     PROD_CHAIN_ADAPTER_HOST
+    PROD_GRAFANA_HOST
+    PROD_PLATFORM_REGISTRY_HOST
     WORKER_AVAILABLE_CPU
     PROD_POOL_ADDRESS
-    GRAFANA_HOME_NAME
+    WORKERPOOL_DESCRIPTION
+    LETSENCRYPT_ADMIN_EMAIL
 </pre>
 
 See how those variables are used in */docker-compose.yml and find the detailed corresponding documentation at https://github.com/iExecBlockchainComputing/iexec-worker/ and https://github.com/iExecBlockchainComputing/iexec-core/ (Remember to adapt the branch or tag according to the version you are using). 
 
-Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. The Core server exposes 3 services binded to services "core", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST and the PROD_CHAIN_ADAPTER_HOST by the Core server static IP or a DNS name. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
+Basicly, replace the wallets passwords with the corresponding ones and for the other passwords, generate some strong new ones. The Core server exposes 4 services binded to services "core", "platform-registry", "grafana" and "chain-adapter", then replace the PROD_CORE_HOST, PROD_GRAFANA_HOST, PROD_PLATFORM_REGISTRY_HOST and the PROD_CHAIN_ADAPTER_HOST by some DNS names resolved to the Core server public IP. You should also provide a valid administrators email address with ```LETSENCRYPT_ADMIN_EMAIL```. Finally, replace the PROD_POOL_ADDRESS with your previously generated workerpool address.
 
-You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (defaults to: TOTAL_WORKER_CPU - 1). It might be good for your own convenience to adapt the GRAFANA_HOME_NAME to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
+You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on paralel tasks your worker can run (empty value defaults to: TOTAL_WORKER_CPU - 1). It might be good for your own convenience to adapt the WORKERPOOL_DESCRIPTION to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
 
-You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps you core service not read the blockchain from a too old point in time and save him efforts. When you deploy your workerpool, put a very recent block number, less than 20 blocks old. You can get the last mined block at https://blockscout-bellecour.iex.ec/blocks . It might happen that to core service is lost reading a too large amount of blocks from the blockchain and then, does not see new deals. In such a case, you need to turn of the core services, set a very fresh value in .env, reset some mongo documents : Configuration and ReplayConfiguration and then turn the core services on again. If you are not interested in the mongo historical data (it's like reseting completely your workerpool), you can just wipe the mongo volume with *docker-compose down -v*, set a fresh new CHAIN_LAST_BLOCK and *docker-compose up -d*. 
+You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps your core service not to read the blockchain from a too old point in time and save him efforts. When you deploy your workerpool, put a very recent block number, less than 20 blocks old. You can get the last mined block at https://blockscout-bellecour.iex.ec/blocks . It might happen that to core service is lost reading a too large amount of blocks from the blockchain and then, does not see new deals. In such a case, you need to turn of the core services, set a very fresh value in .env, reset some mongo documents : Configuration and ReplayConfiguration and then turn the core services on again. If you are not interested in the mongo historical data (it's like reseting completely your workerpool), you can just wipe the mongo volume with *docker compose down -v*, set a fresh new CHAIN_LAST_BLOCK and *docker compose up -d*. 
 
 
 # Deployment
 
-- Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit **on your own**). 
+- Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit and **on your own**). 
 
-- The Core server will host the Core services (scheduler). It should have a static IP or a DNS name for commminucations from the worker. 
+- The Core server will host the Core services (scheduler). It should have a static IP for commminucations from the worker and 4 DNS names for HTTP virtual host routing. 
 
-- The Worker server will host the worker services. It should not be exposed on the internet for security reasons. 
+- The Worker server will host the worker services. It should not be exposed on the internet for obvious security reasons. 
 
 
 ## Core (Scheduler) service deployment
 
-We will copy files and start the core services onto the Core server: 
+You will copy files and start the core services onto the Core server as such: 
 
 - Copy the customized .env and core directory in the ```"/opt"``` directory (or somewhere you'd rather install the core services)
 
@@ -251,21 +249,28 @@ We will copy files and start the core services onto the Core server:
 
 - For security issues, you *can* delete the worker-specific part in the .env file
 
-- Start the core services with ```"docker-compose up -d"``` from the core directory
+- Start the core services with ```"docker compose up -d"``` from the core directory
 
-- You can check 3 services:
+- You can check 4 services:
 
-    - Blockchain Adapter exposes the blockchain configuration:
+    - Blockchain Adapter exposes the blockchain configuration (and its health):
 
-    ```"http://$PROD_CHAIN_ADAPTER_HOST:13010/config/chain"```
+    ```"https://$PROD_CHAIN_ADAPTER_HOST/config/chain"```
+    ```"https://$PROD_CHAIN_ADAPTER_HOST/actuator/health"```
 
-    - Core metrics:
+    - Core exposes metrics (and its health):
 
-    ```"http://$PROD_CORE_HOST:7001/metrics"```
+    ```"https://$PROD_CORE_HOST/metrics"```
+    ```"https://$PROD_CORE_HOST/actuator/health"```
 
-    - Grafana (core) metrics dashboard:
+    - Grafana exposes a dashboard:
 
-    ```"http://$PROD_CORE_HOST:7000/"```
+    ```"https://$PROD_GRAFANA_HOST/"```
+
+    - The platform registry exposes some service URLs (and its health):
+
+    ```"https://$PROD_PLATFORM_REGISTRY_HOST/chain/134"```
+    ```"https://$PROD_PLATFORM_REGISTRY_HOST/actuator/health"```
 
   
 Congratulations, you are now running your own scheduler.
@@ -278,7 +283,7 @@ Let's add a worker to complete the workerpool.
 
 You may create as many workers as you want by repeating and adapting all the worker-specific steps (wallet creation, server creation and service deployment) but you'll have to do it **on your own**.
 
-We will copy files and start the worker services onto the Worker server: 
+You will copy files and start the worker services onto the Worker server as such: 
 
 - Copy the customized .env and worker directory in the ```"/opt"``` directory (or somewhere you'd rather install the worker services)
 
@@ -286,24 +291,24 @@ We will copy files and start the worker services onto the Worker server:
 
 - For security issues, you could delete the core-specific part in the .env file
 
-- Start the worker services with ```"docker-compose up -d"``` from the worker directory
+- Start the worker services with ```"docker compose up -d"``` from the worker directory
   
 
 # Status checking
 
 ## Worker should join the workerpool 
 
-- Reload the core pages, you should see 1 alive worker.
+- Reload the core metrics and dashboard, you should see 1 alive worker.
 
-```"http://$PROD_CORE_HOST:7001/metrics"```
+```"https://$PROD_CORE_HOST/metrics"```
 
-```"http://$PROD_CORE_HOST:7000/"```
+```"https://$PROD_GRAFANA_HOST/"```
 
 ## The Core server should publish workerpool orders
 
-The order-publisher-std service should publish workerpool orders on the marketplace (within some minutes). You can check those orders by running an iExec CLI command inside this container: <pre>docker-compose exec -T "order-publisher-std" sh -c 'iexec orderbook workerpool "$WORKERPOOL" --chain "$CHAIN" --tag "$TAG"'</pre> 
+The order-publisher-std service should publish workerpool orders on the marketplace (within some minutes). You can check those orders by running an iExec CLI command inside this container: <pre>docker compose exec -T "order-publisher-std" sh -c 'iexec orderbook workerpool "$WORKERPOOL" --chain "$CHAIN" --tag "$TAG"'</pre> 
 
-You can check the service logs to see orders being published: <pre>docker-compose logs "order-publisher-std"</pre>
+You can check the service logs to see orders being published: <pre>docker compose logs "order-publisher-std"</pre>
   
 
 ## Order manual management
@@ -327,36 +332,39 @@ This tutorial doesn't go into further support for more features like the sub-dir
 Although not fully supported, those features basicly work by:
 1. copying the files to the Worker and/or Core server (see ```$ROLE/docker-compose-${FEATURE}.yml``` files)
 1. adapting some variables used in thoses new compose files (see ```$ROLE/.env-$FEATURE``` files)
-1. using docker-compose command with multiple compose files like ```"docker-compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml <compose command and args>"``` or fusionning compose files properly (for Advanced users). 
+1. using docker compose command with multiple compose files like ```"docker compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml <compose command and args>"``` or fusionning compose files properly (for advanced users). 
 
 Some feature-specific operations might be necessary. 
 
-Some features can be combined (HTTPS + TEE) but some obviously can not (HTTP AND HTTPS). 
+## TEE
 
-## Reverse-proxy with HTTP
+TEE deals come in two different flavour, Scone and Gramine. As you can see in the core/docker-compose-tee.yml file, it will add 2 order-publishers, one for each flavour as you can run Gramine and Scone Tee tasks on the same servers. If you are not interested in one of them, you can just delete the corresponding service. 
 
-It helps not dealing with unusual ports but instead, offers some DNS names customization. 
+On the Worker server, you need to provide the SGX devices (/dev/sgx_enclave and /dev/sgx_provision) and the worker will use them automatically. The native SGX drivers are installed by default on Linux Kernel >= 5.9, juste check the devices. 
 
-Copy files and add the environment variable ```PROD_GRAFANA_HOST``` for the Core services. 
+You should also install **some** software from this guide : https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md :
 
-From the core service, you should, as a security issue, also remove from ```core/docker-compose.yml``` the ports redirections since the reverse-proxy is here for it: 
-* 7001:13000
-* 7000:3000
-* 13010:13010
-
-## Reverse-proxy with HTTPS
-
-Same as [Reverse-proxy with HTTP](#Reverse-proxy-with-HTTP) but the Nginx reverse-proxy will also use Letsencrypt to generate HTTPS certificates for the DNS names so those DNS names must be public and you should provide a valid administrators email address with ```LETSENCRYPT_ADMIN_EMAIL```
-
-## TEE 
-
-In order to provide the SGX Scone device (/dev/isgx), you should install the Scone SGX drivers on the Worker server: 
+Some packages might be needed, if not already installed : 
 
 ```console
-$ curl -fssl https://raw.githubusercontent.com/SconeDocs/SH/master/install_sgx_driver.sh | bash
+$ sudo apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 ```
 
-There also are 2 mandatory variables which will make the worker able to download the pre and post compute images: for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
+Then, add the APT key : 
+
+```console
+$ wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
+```
+
+Then, install the open-enclave-hostverify package and its dependencies : 
+
+```console
+$ sudo apt -y install clang-10 libssl-dev gdb libprotobuf17 libsgx-dcap-ql libsgx-dcap-ql-dev az-dcap-client open-enclave-hostverify
+```
+
+Watch for the guide details as it might change over time.
+
+There also are 2 mandatory variables which will make the worker able to download the iExec pre and post compute images: for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
 
 You may also need to read the [Scontain documentation](https://sconedocs.github.io/). 
 
