@@ -55,6 +55,8 @@ Software for deployment an registration (basic installation **on your own**):
 
 - [iExec SDK CLI](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md), check your version with iexec -V and make sure that the major version is 8. 
 
+- *jq* for debug convenience, installation is up to you, maybe use *cat* which should be embedded almost everywhere. 
+
 NB: The worker server will most likely run many different docker images which will most likely consume a lot of disk space. You should manage this **on your own** with a scheduled task like cron and the command:
 
 ```console
