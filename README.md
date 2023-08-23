@@ -340,7 +340,7 @@ Some feature-specific operations might be necessary.
 
 ## TEE
 
-TEE deals come in two different flavour, Scone and Gramine. As you can see in the core/docker-compose-tee.yml file, it will add 2 order-publishers, one for each flavour as you can run Gramine and Scone Tee tasks on the same servers. If you are not interested in one of them, you can just delete the corresponding service. 
+TEE deals come in two different flavours, Scone and Gramine. As you can see in the core/docker-compose-tee.yml file, it will add 2 order-publishers, one for each flavour as you can run Gramine and Scone Tee tasks on the same servers. If you are not interested in one of them, you can just delete the corresponding service. 
 
 On the Worker server, you need to provide the SGX devices (/dev/sgx_enclave and /dev/sgx_provision) and the worker will use them automatically. The native SGX drivers are installed by default on Linux Kernel >= 5.9, juste check the devices. 
 
