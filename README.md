@@ -352,10 +352,19 @@ Some packages might be needed, if not already installed :
 $ sudo apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 ```
 
-Then, add the APT key : 
+Then, add the APT key and sources : 
 
 ```console
+$ echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
 $ wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
+
+$ echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee /etc/apt/sources.list.d/llvm-toolchain-focal-10.list
+$ wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+
+$ echo "deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main" | sudo tee /etc/apt/sources.list.d/msprod.list
+$ wget -qO - https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+
+$ sudo apt update
 ```
 
 Then, install the open-enclave-hostverify package and its dependencies : 
@@ -364,7 +373,7 @@ Then, install the open-enclave-hostverify package and its dependencies :
 $ sudo apt -y install clang-10 libssl-dev gdb libprotobuf17 libsgx-dcap-ql libsgx-dcap-ql-dev az-dcap-client open-enclave-hostverify
 ```
 
-Watch for the guide details as it might change over time.
+**Watch for the guide details as it might change over time.**
 
 There also are 2 mandatory variables which will make the worker able to download the iExec pre and post compute images: for Scontain username and password, create an account at https://gitlab.scontain.com/users/sign_up. 
 
