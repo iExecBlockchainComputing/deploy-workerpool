@@ -236,7 +236,7 @@ You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps
 
 - Create 2 servers (or deploy both worker and scheduler on the same server but in two different directories by adapting this procedure a little bit and **on your own**). 
 
-- The Core server will host the Core services (scheduler). It should have a static IP for commminucations from the worker and 4 DNS names for HTTP virtual host routing. 
+- The Core server will host the Core services (scheduler). It should have a static IP for communications from the worker and 4 DNS names for HTTP virtual host routing. 
 
 - The Worker server will host the worker services. It should not be exposed on the internet for obvious security reasons. 
 
