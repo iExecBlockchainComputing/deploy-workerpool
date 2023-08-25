@@ -48,7 +48,7 @@ Workerpool servers:
 
 - Packages: docker and its compose plugin (compose V2 as a plugin for the ```"docker compose"``` command) with the standard installation steps provided on https://docs.docker.com/compose
 
-- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). Also, make sure the Core server can request LetsEncrypt certificates based on the ACME HTTP-01 challenge (see the letsencrypt service companion) which basically means to provide this server a public IP address. 
+- Network: Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). Also, make sure the Core server can request LetsEncrypt certificates based on the ACME HTTP-01 challenge (see the letsencrypt service companion) which basically means to provide this server a public IP address. 
 
  
 Software for deployment an registration (basic installation **on your own**):
@@ -182,7 +182,7 @@ Keep in mind that the workerpool address corresponds to your workerpool registra
 Optional but recommended for the task feedback to work, you can associate an ENS name to your workerpool deployment address and register your Workerpool API address. This is done through 3 steps:
 
 First, you must have an ENS address owned by the Core's wallet. You can first claim an entire global domain (with your ENS admin wallet), for instance *main.pools.yourdomain.eth*, then create your Workerpool dedicated ENS subdomain, for instance *prod-v8-bellecour* and then transfer the ownership of *prod-v8-bellecour.main.pools.yourdomain.eth* to the Core's wallet. 
-If you are well versed with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow those steps : 
+If you are well versed with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow those steps: 
 
 1. On a computer with docker and metamask browser plugin installed, start our basic ENS manager docker image listening in background on port 8080: 
     ```console
@@ -282,7 +282,7 @@ Basically, replace the wallets passwords with the corresponding ones and for the
 
 You may also want to customize some other variables for further uses but this is not detailed here. Only pay attention to WORKERPOOL_PRICE and ORDER_PUBLISHER_REQUESTER_RESTRICT which names are explicit enough. You might also want to adapt the WORKER_AVAILABLE_CPU to control the number on parallel tasks your worker can run (empty value defaults to: TOTAL_WORKER_CPU - 1). It might be good for your own convenience to adapt the WORKERPOOL_DESCRIPTION to match you Workerpool public description from step [Core (Scheduler) Registration](#Core-Scheduler-Registration). 
 
-You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps your core service not to read the blockchain from a too old point in time and save him efforts. When you deploy your workerpool, put a very recent block number, less than 20 blocks old. You can get the last mined block at https://blockscout-bellecour.iex.ec/blocks . It might happen that the core service is lost reading a too large amount of blocks from the blockchain and then, does not see new deals. In such a case, you need to turn off the core services, set a very fresh value in .env, reset some mongo documents : Configuration and ReplayConfiguration and then turn the core services on again. If you are not interested in the mongo historical data (it's like resetting completely your workerpool), you can just wipe the mongo volume with *docker compose down -v*, set a fresh new CHAIN_LAST_BLOCK and *docker compose up -d*. 
+You must also pay attention to the CHAIN_LAST_BLOCK in the .env file, this helps your core service not to read the blockchain from a too old point in time and save him efforts. When you deploy your workerpool, put a very recent block number, less than 20 blocks old. You can get the last mined block at https://blockscout-bellecour.iex.ec/blocks . It might happen that the core service is lost reading a too large amount of blocks from the blockchain and then, does not see new deals. In such a case, you need to turn off the core services, set a very fresh value in .env, reset some mongo documents: Configuration and ReplayConfiguration and then turn the core services on again. If you are not interested in the mongo historical data (it's like resetting completely your workerpool), you can just wipe the mongo volume with *docker compose down -v*, set a fresh new CHAIN_LAST_BLOCK and *docker compose up -d*. 
 
 
 # Deployment
@@ -397,7 +397,7 @@ TEE deals come in two different flavours, Scone and Gramine. As you can see in t
 
 On the Worker server, you need to provide the SGX devices (/dev/sgx_enclave and /dev/sgx_provision) and the worker will use them automatically. The native SGX drivers are installed by default on Linux Kernel >= 5.11, just check the devices. 
 
-You should also install **some** software from this guide: https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md
+You should also install **some** software from this guide (as described below): https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md
 
 Some packages might be needed, if not already installed: 
 
@@ -420,7 +420,7 @@ $ wget -qO - https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key ad
 $ sudo apt update
 ```
 
-Then, install the open-enclave-hostverify package and its dependencies : 
+Then, install the open-enclave-hostverify package and its dependencies: 
 
 ```console
 $ sudo apt -y install clang-10 libssl-dev gdb libprotobuf17 libsgx-dcap-ql libsgx-dcap-ql-dev az-dcap-client open-enclave-hostverify
