@@ -397,7 +397,7 @@ TEE deals come in two different flavours, Scone and Gramine. As you can see in t
 
 On the Worker server, you need to provide the SGX devices (/dev/sgx_enclave and /dev/sgx_provision) and the worker will use them automatically. The native SGX drivers are installed by default on Linux Kernel >= 5.11, just check the devices. 
 
-You should also install **some** software from this guide : https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md :
+You should also install **some** software from this guide: https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md
 
 Some packages might be needed, if not already installed: 
 
