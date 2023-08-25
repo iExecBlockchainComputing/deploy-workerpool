@@ -125,7 +125,7 @@ $ mv   UTC--2022-11-14T19-27-56.277000000Z--d2e57b7121fc43169aab2e3dc37e4338ca58
 ```
 
 
-⚠ Make sure to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsability to save and protect thoses files and associated passwords even on the servers. 
+⚠ Make sure to securely save and protect these wallet files and the associated passwords. Those wallets can never be retrieved by either iExec nor anybody. It is fully under your responsibility to save and protect those files and associated passwords even on the servers. 
   
 
 - Localy initialize you workerpool registration:
