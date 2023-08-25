@@ -179,7 +179,7 @@ You may now consult the workerpool metadata by typing your workerpool address in
 Keep in mind that the workerpool address corresponds to your workerpool registration address and not the wallet owner address. 
 
 
-Optionnal but recommended for the task feedback to work, you have associate an ENS name to you workerpool deployment address and register your Workerpool API address. This is done Through 3 steps:
+Optional but recommended for the task feedback to work, you can associate an ENS name to your workerpool deployment address and register your Workerpool API address. This is done through 3 steps:
 
 First, you must have an ENS address owned by the Core's wallet. You can first claim an entire global domain (with your ENS admin wallet), for instance *main.pools.iexec.eth*, then create your Workerpool dedicated ENS subdomain, for instance *prod-v8-bellecour* and then transfer the ownership of *prod-v8-bellecour.main.pools.iexec.eth* to the Core's wallet. 
 If you are well versed enough with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow thoses steps : 
