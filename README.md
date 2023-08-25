@@ -369,7 +369,7 @@ You can check the service logs to see orders being published: <pre>docker compos
 ## Order manual management
 
 - Have a look at the [CLI Documentation](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md#SDK-CLI-for-Workerpools)
-- Basically, you can restric who can use you workerpool by publishing a specific workerpool order
+- Basically, you can restrict who can use your workerpool by publishing a specific workerpool order
 ```console
 $ iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir ./ --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
 ```
