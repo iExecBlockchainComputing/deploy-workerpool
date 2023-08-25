@@ -384,7 +384,7 @@ $ iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --
 
 This tutorial doesn't go into further support for more features like the sub-directories under *features* directory.  
 
-Although not fully supported, those features basicly work by:
+Although not fully supported, those features basically work by:
 1. copying the files to the Worker and/or Core server (see ```$ROLE/docker-compose-${FEATURE}.yml``` files)
 1. adapting some variables used in thoses new compose files (see ```$ROLE/.env-$FEATURE``` files)
 1. using docker compose command with multiple compose files like ```"docker compose -f docker-compose.yml -f docker-compose-${FEATURE}.yml <compose command and args>"``` or merging compose files properly (for advanced users). 
