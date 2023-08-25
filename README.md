@@ -182,7 +182,7 @@ Keep in mind that the workerpool address corresponds to your workerpool registra
 Optional but recommended for the task feedback to work, you can associate an ENS name to your workerpool deployment address and register your Workerpool API address. This is done through 3 steps:
 
 First, you must have an ENS address owned by the Core's wallet. You can first claim an entire global domain (with your ENS admin wallet), for instance *main.pools.yourdomain.eth*, then create your Workerpool dedicated ENS subdomain, for instance *prod-v8-bellecour* and then transfer the ownership of *prod-v8-bellecour.main.pools.yourdomain.eth* to the Core's wallet. 
-If you are well versed enough with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow thoses steps : 
+If you are well versed with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow those steps : 
 
     1. On a computer with docker and metamask browser plugin installed, start our basic ENS manager docker image listening in background on port 8080: 
     ```console
