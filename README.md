@@ -399,7 +399,7 @@ On the Worker server, you need to provide the SGX devices (/dev/sgx_enclave and 
 
 You should also install **some** software from this guide : https://github.com/openenclave/openenclave/blob/master/docs/GettingStartedDocs/install_host_verify_Ubuntu_20.04.md :
 
-Some packages might be needed, if not already installed : 
+Some packages might be needed, if not already installed: 
 
 ```console
 $ sudo apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
