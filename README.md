@@ -178,6 +178,59 @@ You may now consult the workerpool metadata by typing your workerpool address in
 
 Keep in mind that the workerpool address corresponds to your workerpool registration address and not the wallet owner address. 
 
+
+Optionnal but recommended for the task feedback to work, you have associate an ENS name to you workerpool deployment address and register your Workerpool API address. This is done Through 3 steps:
+
+First, you must have an ENS address owned by the Core's wallet. You can first claim an entire global domain (with your ENS admin wallet), for instance *main.pools.iexec.eth*, then create your Workerpool dedicated ENS subdomain, for instance *prod-v8-bellecour* and then transfer the ownership of *prod-v8-bellecour.main.pools.iexec.eth* to the Core's wallet. 
+If you are well versed enough with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow thoses steps : 
+
+    1. On a computer with docker and metamask browser plugin installed, start our basic ENS manager docker image listening in background on port 8080: 
+    ```console
+    $ docker run -d --name basic-ens-manager --rm -p 8080:80 pierreiexec/basic-ens-manager
+    ```
+    1. Then visit http://localhost:8080/
+    1. Connect your ENS admin wallet into your metamask plugin and remember to use the Bellecour blockchain
+    1. Look for your main domain (for instance *main.pools.iexec.eth*) in the search field
+        a. If the field isn't available, reload the page after connecting with metamask
+    1. Create you workerpool subdomain (for instance *prod-v8-bellecour*)
+    1. Look for the whole workerpool ENS name (for instance *prod-v8-bellecour.main.pools.iexec.eth*)
+    1. Transfert the ownership of the whole workerpool ENS name to your Core's wallet address
+        a. you can look for your Core's wallet address into the core_wallet.json file and prefix the provided address with *0x*:
+        ```console
+        $ echo "0x$(jq -r .address core_wallet.json)"
+        ```
+    1. Look for the whole workerpool ENS name a new time (for instance *prod-v8-bellecour.main.pools.iexec.eth*) and make sure it now belongs to your Core's wallet address and not to your ENS admin wallet address. 
+
+Next, you need to link your workerpool's ENS domain name and deployment address:
+```console
+$ ENS_MAIN_DOMAIN='main.pools.iexec.eth'
+$ ENS_WP_SUBDOMAIN="prod-v8-bellecour"
+$ ENS_WP_DOMAIN="$ENS_WP_SUBDOMAIN.$ENS_MAIN_DOMAIN"
+$ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
+$ iexec ens register "$ENS_WP_SUBDOMAIN" --for "$WP_ADDR" --domain "$ENS_MAIN_DOMAIN" --wallet-file core_wallet.json --keystoredir ./
+```
+
+Finally, you must set your workerpool's API URL: 
+```console
+$ CORE_URL="https://$(grep 'PROD_CORE_HOST=' .env | sed -e 's/PROD_CORE_HOST=//')
+$ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
+$ iexec workerpool set-api-url "$CORE_URL" "$WP_ADDR" --wallet-file core_wallet.json --keystoredir ./
+```
+
+Check your workerpool's settings (ENS name and API URL) with:
+```console
+$ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
+$ iexec workerpool show "$WP_ADDR" --raw | jq
+{
+  "ok": true,
+  "address": "...",
+  "workerpool": {...},
+  "ens": "prod-v8-bellecour.main.pools.iexec.eth",
+  "apiUrl": "https://core-prod.v8-bellecour.yourdomain"
+}
+```
+
+
  
 If you want to deploy a free workerpool (workerpool orders with price = 0 RLC), you can jump to the next section ([Customization](#Customization)). You don't need to stake some RLC on the core's and worker's wallets (the end of this section). 
   
@@ -195,8 +248,8 @@ $ iexec wallet send-RLC "10" --to ${DEST_WALLET_ADDRESS} --wallet-file ${YOUR_OT
 - Then stake this amount of RLC to the iExec account of the wallets (core and worker)
 
 ```console
-$ iexec account deposit 1 RLC --wallet-file core_wallet.json   --keystoredir "$PWD"
-$ iexec account deposit 1 RLC --wallet-file worker_wallet.json --keystoredir "$PWD"
+$ iexec account deposit 1 RLC --wallet-file core_wallet.json   --keystoredir ./
+$ iexec account deposit 1 RLC --wallet-file worker_wallet.json --keystoredir ./
 ```
 
   
@@ -316,14 +369,14 @@ You can check the service logs to see orders being published: <pre>docker compos
 ## Order manual management
 
 - Have a look at the [CLI Documentation](https://github.com/iExecBlockchainComputing/iexec-sdk/blob/master/CLI.md#SDK-CLI-for-Workerpools)
-- Basically, you can restric who can use you workerpool by publishing specific a workerpool order
+- Basically, you can restric who can use you workerpool by publishing a specific workerpool order
 ```console
-$ iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir "$PWD" --chain goerli --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
+$ iexec workerpool publish --wallet-file "core_wallet.json" --keystoredir ./ --requester-restrict 0x0123456789000000000000000000000000000000 --category 1 --price 0 --volume 1 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B
 ```
 
 - You can unpublish all your workerpoolorders using
 ```console
-$ iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --wallet-file "core_wallet.json" --keystoredir "$PWD"
+$ iexec workerpool unpublish --all 0x3c611ad1cAe35D563a5567a04475B0c31503bf4B --wallet-file "core_wallet.json" --keystoredir ./
 ```
 
 
