@@ -48,7 +48,7 @@ Workerpool servers:
 
 - Packages: docker and its compose plugin (compose V2 as a plugin for the ```"docker compose"``` command) with the standard installation steps provided on https://docs.docker.com/compose
 
-- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). Also, make sure the Core server can request LetsEncrypt certificates based on the ACME HTTP-01 challenge (see the letsencrypt service companion) which basicly means to provide this server a public IP address. 
+- Network : Make sure the core and worker can request the web with HTTP/S (80,443) and that the worker can contact the core (see the port on the testing core URLs or wide open communications between them). Also, make sure the Core server can request LetsEncrypt certificates based on the ACME HTTP-01 challenge (see the letsencrypt service companion) which basically means to provide this server a public IP address. 
 
  
 Software for deployment an registration (basic installation **on your own**):
