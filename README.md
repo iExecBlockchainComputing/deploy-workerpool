@@ -405,7 +405,7 @@ Some packages might be needed, if not already installed:
 $ sudo apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 ```
 
-Then, add the APT key and sources : 
+Then, add the APT key and sources: 
 
 ```console
 $ echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
