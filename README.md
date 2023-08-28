@@ -179,53 +179,30 @@ You may now consult the workerpool metadata by typing your workerpool address in
 Keep in mind that the workerpool address corresponds to your workerpool registration address and not the wallet owner address. 
 
 
-Optional but recommended for the task feedback to work, you can associate an ENS name to your workerpool deployment address and register your Workerpool API address. This is done through 3 steps:
+Optional but recommended for the task feedback to work, you can associate an ENS name to your workerpool deployment address and register your Workerpool API address. This is done through 2 steps:
 
-First, you must have an ENS address owned by the Core's wallet. You can first claim an entire global domain (with your ENS admin wallet), for instance *main.pools.yourdomain.eth*, then create your Workerpool dedicated ENS subdomain, for instance *prod-v8-bellecour* and then transfer the ownership of *prod-v8-bellecour.main.pools.yourdomain.eth* to the Core's wallet. 
-If you are well versed with ENS smart contracts, you can do this on your own (remember to do it on the right blockchain, Bellecour) or you can follow those steps: 
-
-1. On a computer with docker and metamask browser plugin installed, start our basic ENS manager docker image listening in background on port 8080: 
-    ```console
-    $ docker run -d --name basic-ens-manager --rm -p 8080:80 pierreiexec/basic-ens-manager
-    ```
-1. Then visit http://localhost:8080/
-1. Connect your ENS admin wallet into your metamask plugin and remember to use the Bellecour blockchain
-1. Look for your main domain (for instance *main.pools.yourdomain.eth*) in the search field
-    a. If the field isn't available, reload the page after connecting with metamask
-1. Create you workerpool subdomain (for instance *prod-v8-bellecour*)
-1. Look for the whole workerpool ENS name (for instance *prod-v8-bellecour.main.pools.yourdomain.eth*)
-1. Transfert the ownership of the whole workerpool ENS name to your Core's wallet address
-    a. you can look for your Core's wallet address into the core_wallet.json file and prefix the provided address with *0x*:
-    ```console
-    $ echo "0x$(jq -r .address core_wallet.json)"
-    ```
-1. Look for the whole workerpool ENS name a new time (for instance *prod-v8-bellecour.main.pools.yourdomain.eth*) and make sure it now belongs to your Core's wallet address and not to your ENS admin wallet address. 
-
-Next, you need to link your workerpool's ENS domain name and deployment address:
+First, you need to register an ENS and setup both ENS resolution and reverse resolution to your workerpool's deployment address:
 ```console
-$ ENS_MAIN_DOMAIN='main.pools.yourdomain.eth'
-$ ENS_WP_SUBDOMAIN="prod-v8-bellecour"
-$ ENS_WP_DOMAIN="$ENS_WP_SUBDOMAIN.$ENS_MAIN_DOMAIN"
+$ ENS_WP_SUBDOMAIN="myworkerpool"
 $ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
-$ iexec ens register "$ENS_WP_SUBDOMAIN" --for "$WP_ADDR" --domain "$ENS_MAIN_DOMAIN" --wallet-file core_wallet.json --keystoredir ./
+$ iexec ens register "$ENS_WP_SUBDOMAIN" --for "$WP_ADDR" --wallet-file core_wallet.json --keystoredir ./
 ```
 
 Finally, you must set your workerpool's API URL: 
 ```console
-$ CORE_URL="https://$(grep 'PROD_CORE_HOST=' .env | sed -e 's/PROD_CORE_HOST=//')
+$ CORE_URL="https://$(grep 'PROD_CORE_HOST=' .env | sed -e 's/PROD_CORE_HOST=//')"
 $ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
 $ iexec workerpool set-api-url "$CORE_URL" "$WP_ADDR" --wallet-file core_wallet.json --keystoredir ./
 ```
 
 Check your workerpool's settings (ENS name and API URL) with:
 ```console
-$ WP_ADDR="$(jq -r ".workerpool | first(.[])" deployed.json )"
-$ iexec workerpool show "$WP_ADDR" --raw | jq
+$ iexec workerpool show --raw | jq
 {
   "ok": true,
   "address": "...",
   "workerpool": {...},
-  "ens": "prod-v8-bellecour.main.pools.yourdomain.eth",
+  "ens": "myworkerpool.pools.iexec.eth",
   "apiUrl": "https://core-prod.v8-bellecour.yourdomain"
 }
 ```
