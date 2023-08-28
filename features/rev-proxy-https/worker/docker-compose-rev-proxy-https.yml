@@ -1,7 +1,0 @@
-version: '3.6'
-
-services:
-  worker:
-    environment:
-      - IEXEC_CORE_PORT=443
-      - IEXEC_CORE_PROTOCOL=https
