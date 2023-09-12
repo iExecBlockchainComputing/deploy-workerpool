@@ -15,7 +15,6 @@ services:
     - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
     - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_CAP=$GAS_PRICE_CAP
     - VIRTUAL_HOST=${PROD_CHAIN_ADAPTER_HOST}
-    - LETSENCRYPT_HOST=${PROD_CHAIN_ADAPTER_HOST}
     - VIRTUAL_PORT=13010
     healthcheck:
       test: curl --fail http://localhost:13010/actuator/health || exit 1
@@ -59,8 +58,8 @@ services:
     - IEXEC_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
     - IEXEC_GAS_PRICE_CAP=$GAS_PRICE_CAP
     - IEXEC_CORE_CHAIN_ADAPTER_HOST=$PROD_CHAIN_ADAPTER_HOST
-    - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=https
-    - IEXEC_CORE_CHAIN_ADAPTER_PORT=443
+    - IEXEC_CORE_CHAIN_ADAPTER_PROTOCOL=http
+    - IEXEC_CORE_CHAIN_ADAPTER_PORT=80
     - IEXEC_CORE_CHAIN_ADAPTER_PASSWORD=$PROD_CHAIN_ADAPTER_PASSWORD
     - IEXEC_RESULT_REPOSITORY_HOST=$RESULT_HOST
     - IEXEC_RESULT_REPOSITORY_PORT=443
@@ -68,7 +67,6 @@ services:
     - IEXEC_PLATFORM_REGISTRY=http://platform-registry:8888
     - IEXEC_PLATFORM_REGISTRY_STACK=$CHAIN_ID
     - VIRTUAL_HOST=${PROD_CORE_HOST}
-    - LETSENCRYPT_HOST=${PROD_CORE_HOST}
     - VIRTUAL_PORT=13000
     healthcheck:
       test: curl --fail http://localhost:13000/actuator/health || exit 1
@@ -107,25 +105,9 @@ services:
     - POOL_JOIN_IEXEC_SDK_VERSION=
     - VIRTUAL_HOST=${PROD_GRAFANA_HOST}
     - VIRTUAL_PATH=/
-    - LETSENCRYPT_HOST=${PROD_GRAFANA_HOST}
     - VIRTUAL_PORT=3000
     image: iexechub/grafana:$CORE_GRAFANA_TAG
     restart: unless-stopped
-  letsencrypt:
-    depends_on:
-    - nginx-proxy
-    environment:
-    - DEFAULT_EMAIL=$LETSENCRYPT_ADMIN_EMAIL
-    - NGINX_PROXY_CONTAINER=nginx-proxy
-    image: nginxproxy/acme-companion:$ACME_COMPANION_TAG
-    restart: unless-stopped
-    volumes:
-    - nginxconf:/etc/nginx/conf.d
-    - nginxvhost:/etc/nginx/vhost.d
-    - nginxhtml:/usr/share/nginx/html
-    - nginxcerts:/etc/nginx/certs:rw
-    - companioncerts:/etc/acme.sh
-    - /var/run/docker.sock:/var/run/docker.sock:ro
   mongo:
     command: -c "mongod --bind_ip_all --port 13002"
     entrypoint: /bin/bash
@@ -198,7 +180,6 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=native
     - VIRTUAL_HOST=${PROD_PLATFORM_REGISTRY_HOST}
-    - LETSENCRYPT_HOST=${PROD_PLATFORM_REGISTRY_HOST}
     - VIRTUAL_PORT=8888
     image: hyness/spring-cloud-config-server:$PLATFORM_REGISTRY_TAG
     restart: unless-stopped
