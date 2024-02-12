@@ -34,6 +34,7 @@ services:
     - IEXEC_WORKER_DOCKER_REGISTRY_ADDRESS_1=${REGISTRY_ADDRESS:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_USERNAME_1=${REGISTRY_USERNAME:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_PASSWORD_1=${REGISTRY_PASSWORD:-}
+    - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,prometheus
     healthcheck:
       test: curl --fail http://localhost:13100/actuator/health || exit 1
     image: $DOCKER_REGISTRY/iexec-worker:$WORKER_TAG
@@ -46,4 +47,3 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     - $RESULTS_DIR/worker_prod-$WORKER_ID:$RESULTS_DIR/worker_prod-$WORKER_ID
     - ./$WALLET:/$WALLET:rw
-version: '3.6'

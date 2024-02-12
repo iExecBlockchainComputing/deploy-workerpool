@@ -13,7 +13,7 @@ with open("%s/common/core_prod/docker-compose.yml" % STACK_DEPLOY_SRC) as file:
   core_compose = yaml.load(file, Loader=SafeLoader)
 
 ## tee order-publishers
-tee_core_compose = {'version': core_compose['version']}
+tee_core_compose = {'volumes': core_compose['volumes']}
 tee_core_compose['services'] = {}
 
 for service_name in core_compose['services'].copy():
@@ -30,6 +30,9 @@ for service_name in core_compose['services'].copy():
               print("%s is deleted" % service_name)
               core_compose['services'].pop(service_name)
               tee_core_compose['services'][service_name] = service
+    elif service_name.endswith('-exporter'):
+      print("%s is deleted" % service_name)
+      core_compose['services'].pop(service_name)
 
 # ## Corriger les env pour joindre le CHAIN_ADAPTER (plus utile depuis qu'on supporte le HTTPS par défaut)
 # for index,var in enumerate(core_compose['services']['core']['environment']):
