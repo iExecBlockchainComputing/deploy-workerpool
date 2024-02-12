@@ -40,7 +40,7 @@ cp -a "$STACK_DEPLOY_SRC/config-$STACK-bellecour/worker_prod/." worker
 ./worker/scripts/individualize.sh 0
 
 echo "= Confidentialité et anonymisation"
-rm vars_to_customize.txt
+test ! -f vars_to_customize.txt || rm vars_to_customize.txt
 # Retirer les infos confidentielles de iExec : 
 function rm_value {
     # efface la valeur des variables .*$1.* dans les .env de core et worker
