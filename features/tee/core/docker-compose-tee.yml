@@ -22,7 +22,7 @@ services:
     - TAG=0x0000000000000000000000000000000000000000000000000000000000000005
     - APP_RESTRICT=
     - DATASET_RESTRICT=
-    - REQUESTER_RESTRICT=$ORDER_PUBLISHER_REQUESTER_RESTRICT
+    - REQUESTER_RESTRICT=${ORDER_PUBLISHER_REQUESTER_RESTRICT:-}
     image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
     restart: unless-stopped
     volumes:
@@ -50,9 +50,15 @@ services:
     - TAG=0x0000000000000000000000000000000000000000000000000000000000000003
     - APP_RESTRICT=
     - DATASET_RESTRICT=
-    - REQUESTER_RESTRICT=$ORDER_PUBLISHER_REQUESTER_RESTRICT
+    - REQUESTER_RESTRICT=${ORDER_PUBLISHER_REQUESTER_RESTRICT:-}
     image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
     restart: unless-stopped
     volumes:
     - ./wallet.json:/wallets/wallet.json
-version: '3.4'
+volumes:
+  companioncerts: null
+  mongodb-data: null
+  nginxcerts: null
+  nginxconf: null
+  nginxhtml: null
+  nginxvhost: null
