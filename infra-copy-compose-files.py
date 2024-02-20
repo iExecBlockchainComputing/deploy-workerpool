@@ -52,6 +52,11 @@ for index,var in enumerate(core_compose['services']['core']['environment']):
   # Ne pas bloquer la version du worker sur le core
   if re.match("^IEXEC_CORE_REQUIRED_WORKER_VERSION=", var):
     to_remove.append(var)
+  ## No Prometheus metrics
+  if re.match("^MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=", var):
+    newvar = "MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=%s" % 'health'
+    core_compose['services']['core']['environment'][index] = newvar
+    print("changed %s to %s" % (var,newvar))
 
 for var in to_remove:
   core_compose['services']['core']['environment'].remove(var)
