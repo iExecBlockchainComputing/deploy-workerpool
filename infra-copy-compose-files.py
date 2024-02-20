@@ -72,15 +72,6 @@ with open("%s/common/worker_prod/docker-compose.yml" % STACK_DEPLOY_SRC) as file
 
 to_remove = []
 for index,var in enumerate(worker_compose['services']['worker_prod']['environment']):
-  # ## Fix env to let the worker connect to the core (plus utile depuis qu'on supporte le HTTPS par défaut)
-  # if re.match("^IEXEC_CORE_PORT=", var):
-  #   newvar = "IEXEC_CORE_PORT=%s" % core_compose['services']['core']['ports'][0].split(':')[0]
-  #   worker_compose['services']['worker']['environment'][index] = newvar
-  #   print("changed %s to %s" % (var,newvar))
-  # if re.match("^IEXEC_CORE_PROTOCOL=", var):
-  #   newvar = "IEXEC_CORE_PROTOCOL=%s" % 'http'
-  #   worker_compose['services']['worker']['environment'][index] = newvar
-  #   print("changed %s to %s" % (var,newvar))
   ## Deactivate dev logger
   if re.match("^IEXEC_DEVELOPER_LOGGER_ENABLED=", var):
     newvar = "IEXEC_DEVELOPER_LOGGER_ENABLED=%s" % 'False'
@@ -89,6 +80,11 @@ for index,var in enumerate(worker_compose['services']['worker_prod']['environmen
   ## No SGX
   if re.match("^IEXEC_WORKER_SGX_DRIVER_MODE=", var):
     newvar = "IEXEC_WORKER_SGX_DRIVER_MODE=%s" % 'NONE'
+    worker_compose['services']['worker_prod']['environment'][index] = newvar
+    print("changed %s to %s" % (var,newvar))
+  ## No Prometheus metrics
+  if re.match("^MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=", var):
+    newvar = "MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=%s" % 'health'
     worker_compose['services']['worker_prod']['environment'][index] = newvar
     print("changed %s to %s" % (var,newvar))
   ## Remove variables related to SGX-Scontain 
@@ -103,6 +99,8 @@ for var in to_remove:
   worker_compose['services']['worker_prod']['environment'].remove(var)
   print("no more %s" % var)
 
+worker_compose['services'].pop('scone-pre-compute')
+worker_compose['services'].pop('scone-post-compute')
 
 ## save files
 with open('./worker/docker-compose.yml', 'w') as file:

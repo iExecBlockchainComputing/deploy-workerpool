@@ -2,16 +2,6 @@ networks:
   worker-net:
     name: worker-net
 services:
-  scone-post-compute:
-    entrypoint: /bin/sh
-    image: $POST_COMPUTE_IMAGE
-    restart: unless-stopped
-    tty: true
-  scone-pre-compute:
-    entrypoint: /bin/sh
-    image: $PRE_COMPUTE_IMAGE
-    restart: unless-stopped
-    tty: true
   worker_prod:
     container_name: worker_prod-$WORKER_ID
     environment:
@@ -34,7 +24,7 @@ services:
     - IEXEC_WORKER_DOCKER_REGISTRY_ADDRESS_1=${REGISTRY_ADDRESS:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_USERNAME_1=${REGISTRY_USERNAME:-}
     - IEXEC_WORKER_DOCKER_REGISTRY_PASSWORD_1=${REGISTRY_PASSWORD:-}
-    - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,prometheus
+    - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health
     healthcheck:
       test: curl --fail http://localhost:13100/actuator/health || exit 1
     image: $DOCKER_REGISTRY/iexec-worker:$WORKER_TAG
