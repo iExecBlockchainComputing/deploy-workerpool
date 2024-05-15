@@ -324,6 +324,10 @@ You will copy files and start the worker services onto the Worker server as such
 - For security issues, you could delete the core-specific part in the .env file
 
 - Start the worker services with ```"docker compose up -d"``` from the worker directory
+
+If you have multiple workers, you may want to change ```WORKER_ID``` in the .env file of the worker directory.
+
+e.g : ```WORKER_ID=0``` for the first worker and ```WORKER_ID=1``` for the second worker and so on.
   
 
 # Status checking
