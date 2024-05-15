@@ -14,6 +14,7 @@ services:
     - IEXEC_BLOCKCHAIN_ADAPTER_API_PASSWORD=$PROD_CHAIN_ADAPTER_PASSWORD
     - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_MULTIPLIER=$GAS_PRICE_MULTIPLIER
     - IEXEC_BLOCKCHAIN_ADAPTER_API_GAS_PRICE_CAP=$GAS_PRICE_CAP
+    - LOGGING_LEVEL_COM_IEXEC=${LOGGING_LEVEL:-}
     - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,prometheus
     - VIRTUAL_HOST=${PROD_CHAIN_ADAPTER_HOST}
     - LETSENCRYPT_HOST=${PROD_CHAIN_ADAPTER_HOST}
@@ -29,19 +30,6 @@ services:
     entrypoint: /bin/bash
     image: library/mongo:$BLOCKCHAIN_ADAPTER_MONGO_TAG
     restart: unless-stopped
-  blockchain-adapter-mongo-ui:
-    depends_on:
-    - blockchain-adapter-mongo
-    environment:
-    - ME_CONFIG_BASICAUTH_USERNAME=admin
-    - ME_CONFIG_BASICAUTH_PASSWORD=$PROD_MONGO_PASSWORD
-    - ME_CONFIG_MONGODB_PORT=13012
-    - ME_CONFIG_MONGODB_SERVER=blockchain-adapter-mongo
-    - VCAP_APP_PORT=13013
-    image: library/mongo-express:$BLOCKCHAIN_ADAPTER_MONGO_EXPRESS_TAG
-    ports:
-    - 13013:13013
-    restart: unless-stopped
   core:
     depends_on:
     - mongo
@@ -53,6 +41,7 @@ services:
     - TZ=Europe/Paris
     - REVEAL_TIMEOUT_PERIOD=120000
     - IEXEC_ASK_REPLICATE_PERIOD=15000
+    - LOGGING_LEVEL_COM_IEXEC=${LOGGING_LEVEL:-}
     - IEXEC_PRIVATE_CHAIN_ADDRESS=$CHAIN_URL
     - POOL_ADDRESS=$PROD_POOL_ADDRESS
     - IEXEC_START_BLOCK_NUMBER=$CHAIN_LAST_BLOCK
@@ -65,7 +54,7 @@ services:
     - IEXEC_RESULT_REPOSITORY_HOST=$RESULT_HOST
     - IEXEC_RESULT_REPOSITORY_PORT=443
     - IEXEC_RESULT_REPOSITORY_PROTOCOL=https
-    - IEXEC_PLATFORM_REGISTRY=http://platform-registry:8888
+    - IEXEC_PLATFORM_REGISTRY=${PLATFORM_REGISTRY_HOST}
     - IEXEC_PLATFORM_REGISTRY_STACK=$CHAIN_ID
     - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health
     - VIRTUAL_HOST=${PROD_CORE_HOST}
@@ -77,41 +66,6 @@ services:
     restart: unless-stopped
     volumes:
     - ./wallet.json:/iexec-wallet/encrypted-wallet.json
-  grafana:
-    depends_on:
-    - mongo
-    - mongodb-proxy
-    environment:
-    - MONGO_PROXY_URL=http://mongodb-proxy:3333
-    - MONGO_DB_NAME=iexec
-    - MONGO_URL=mongodb://mongo:13002
-    - GF_SECURITY_ADMIN_PASSWORD=$PROD_GRAFANA_ADMIN_PASSWORD
-    - GRAFANA_HOST=localhost:3000
-    - GF_AUTH_ANONYMOUS_ENABLED=true
-    - GF_AUTH_ANONYMOUS_ORG_NAME=ViewerOrg
-    - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-    - GF_ALLOW_SIGN_UP=false
-    - GF_PANELS_DISABLE_SANITIZE_HTML=true
-    - GRAFANA_HOME_NAME=$WORKERPOOL_DESCRIPTION
-    - GRAFANA_HOME_LOGO_WIDTH=35
-    - GRAFANA_HOME_LOGO_HEIGHT=35
-    - GRAFANA_HOME_LOGO_PATH=https://iex.ec/wp-content/uploads/2018/12/token.svg
-    - ACTIVATE_POOL_JOIN=0
-    - POOL_JOIN_WORKER_POOLNAME=
-    - POOL_JOIN_DEPOSIT=
-    - POOL_JOIN_CHAIN=
-    - POOL_JOIN_MINETHEREUM=
-    - POOL_JOIN_HUBCONTRACT=
-    - POOL_JOIN_WORKER_DOCKER_IMAGE_VERSION=
-    - POOL_JOIN_IEXEC_CORE_HOST=
-    - POOL_JOIN_https_=
-    - POOL_JOIN_IEXEC_SDK_VERSION=
-    - VIRTUAL_HOST=${PROD_GRAFANA_HOST}
-    - VIRTUAL_PATH=/
-    - LETSENCRYPT_HOST=${PROD_GRAFANA_HOST}
-    - VIRTUAL_PORT=3000
-    image: iexechub/grafana:$CORE_GRAFANA_TAG
-    restart: unless-stopped
   letsencrypt:
     depends_on:
     - nginx-proxy
@@ -134,28 +88,10 @@ services:
     restart: unless-stopped
     volumes:
     - mongodb-data:/data/db
-  mongo_ui:
-    environment:
-    - ME_CONFIG_BASICAUTH_USERNAME=admin
-    - ME_CONFIG_BASICAUTH_PASSWORD=$PROD_MONGO_PASSWORD
-    - ME_CONFIG_MONGODB_PORT=13002
-    - VCAP_APP_PORT=13003
-    image: mongo-express:$CORE_MONGO_EXPRESS_TAG
-    ports:
-    - 7002:13003
-    restart: unless-stopped
-  mongodb-proxy:
-    image: iexechub/grafana-proxy:$CORE_GRAFANA_PROXY
-    restart: unless-stopped
-  nginx-forbidden:
-    environment:
-    - VIRTUAL_HOST=${PROD_GRAFANA_HOST}
-    - VIRTUAL_PATH=~ ^/api/(?!(dashboards|annotations|datasources|live|plugins|search))
-    image: nginx:$NGINX_STANDALONE_TAG
-    volumes:
-    - ./nginx_deny_all.conf:/etc/nginx/conf.d/default.conf:ro
   nginx-proxy:
     container_name: nginx-proxy
+    environment:
+    - HSTS=max-age=7884000; includeSubDomains; preload
     image: nginxproxy/nginx-proxy:$NGINX_PROXY_TAG
     ports:
     - 80:80
@@ -167,44 +103,6 @@ services:
     - nginxhtml:/usr/share/nginx/html
     - nginxcerts:/etc/nginx/certs:ro
     - /var/run/docker.sock:/tmp/docker.sock:ro
-  order-publisher-std:
-    depends_on:
-    - core
-    environment:
-    - CORE_URL=http://core:13000
-    - MARKET_URL=https://$MARKET_API_HOST
-    - CHAIN=$CHAIN
-    - PUBLISH_PERIOD=3
-    - CHECK_SLEEP_TIME=30
-    - WALLETPASSWORD=$PROD_CORE_WALLET_PASSWORD
-    - DAEMONIZE=true
-    - IS_GPU_POOL=false
-    - MAX_ORDER_NUMBER=${MAX_ORDER_NUMBER:-}
-    - WORKERPOOL=$PROD_POOL_ADDRESS
-    - WORKERPOOL_PRICE=$WORKERPOOL_PRICE
-    - WORKERPOOL_PRICE_MIN=
-    - WORKERPOOL_PRICE_MAX=
-    - VOLUME=1
-    - CATEGORY=0
-    - TRUST=1
-    - TAG=0x0000000000000000000000000000000000000000000000000000000000000000
-    - APP_RESTRICT=
-    - DATASET_RESTRICT=
-    - REQUESTER_RESTRICT=${ORDER_PUBLISHER_REQUESTER_RESTRICT:-}
-    image: iexechub/iexec-order-publisher:$ORDER_PUBLISHER_TAG
-    restart: unless-stopped
-    volumes:
-    - ./wallet.json:/wallets/wallet.json
-  platform-registry:
-    environment:
-    - SPRING_PROFILES_ACTIVE=native
-    - VIRTUAL_HOST=${PROD_PLATFORM_REGISTRY_HOST}
-    - LETSENCRYPT_HOST=${PROD_PLATFORM_REGISTRY_HOST}
-    - VIRTUAL_PORT=8888
-    image: hyness/spring-cloud-config-server:$PLATFORM_REGISTRY_TAG
-    restart: unless-stopped
-    volumes:
-    - ./platform-registry-config:/config
 volumes:
   companioncerts: null
   mongodb-data: null
